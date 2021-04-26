@@ -49,10 +49,22 @@ func main() {
 }
 ```
 
+### Iterator
+
+Iterator tries to emulate a [C++'s iterator](https://en.cppreference.com/w/cpp/iterator/iterator).
+It is defined as follows:
+```go
+type Iterator[T any] interface {
+	Next() bool
+	V()    T
+}
+```
+
+The iterator then has 2 functions, one for incrementing the iterator and another for getting the underlying value.
 
 ### Vector
 
-Vector tries to emulate [C++'s vector](https://en.cppreference.com/w/cpp/container/vector) (somehow).
+Vector tries to emulate a [C++'s vector](https://en.cppreference.com/w/cpp/container/vector) (somehow).
 It doesn't try to emulate it exactly, but it just works as a C++ vector in a way that internally is just
 a slice with some helper functions, in this case functions like `PushBack`, `PushFront`, `PopBack`, `PopFront` or `Len`.
 
