@@ -6,9 +6,14 @@ or they are cumbersome if generics are not present (using interface{} as replace
 
 You can learn more about Golang's generics [here](https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md).
 
-## Data Structures
+# Table of Contents
+1. [Result](#result)
+2. [Optional](#optional)
+3. [Iterator](#iterator)
+4. [Vector](#vector)
+5. [Locker](#locker)
 
-### Result
+## Result
 
 Result tries to emulate [Rust's result](https://doc.rust-lang.org/std/result/).
 
@@ -49,7 +54,7 @@ func main() {
 }
 ```
 
-### Optional
+## Optional
 
 Optional represents an optional value. In C++ we have the [std::optional](https://en.cppreference.com/w/cpp/utility/optional)
 which might be similar.
@@ -72,7 +77,7 @@ func main() {
 }
 ```
 
-### Iterator
+## Iterator
 
 Iterator tries to emulate a [C++'s iterator](https://en.cppreference.com/w/cpp/iterator/iterator).
 It is defined as follows:
@@ -85,7 +90,7 @@ type Iterator[T any] interface {
 
 The iterator then has 2 functions, one for incrementing the iterator and another for getting the underlying value.
 
-### Vector
+## Vector
 
 Vector tries to emulate a [C++'s vector](https://en.cppreference.com/w/cpp/container/vector) (somehow).
 It doesn't try to emulate it exactly, but it just works as a C++ vector in a way that internally is just
@@ -116,7 +121,7 @@ func main() {
 }
 ```
 
-### Locker
+## Locker
 
 A Locker defines a helper structure to facilitate Lock and Unlock wrappers.
 
