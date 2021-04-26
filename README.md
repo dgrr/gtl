@@ -4,6 +4,8 @@ GTL is a template library written in pure Go(2).
 It is intended to hold common data structures that might be missing in the standard library
 or they are cumbersome if generics are not present (using interface{} as replacement, type casting, etc...).
 
+You can learn more about Golang's generics [here](https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md).
+
 ## Data Structures
 
 ### Result
