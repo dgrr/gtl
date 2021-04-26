@@ -7,7 +7,7 @@ type Optional[T any] struct {
 
 // V returns the held value if it has been defined previously.
 func (opt *Optional[T]) V() (v T) {
-	if opt.v != nil {
+	if opt != nil && opt.v != nil {
 		v = *opt.v
 	}
 

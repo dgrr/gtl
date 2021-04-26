@@ -7,20 +7,24 @@ import (
 	"github.com/dgrr/gtl"
 )
 
-func AddEven(a, b int) gtl.Result[int] {
+func AddEven(a, b int) (r gtl.Result[int, error]) {
 	if a % 2 != 0 || b % 2 != 0 {
-		return gtl.Err[int](
+		return r.Err(
 			errors.New("a or b is an odd number"))
 	}
 
-	return gtl.Ok(a + b)
+	return r.Ok(a + b)
 }
 
 func main() {
-	if r := AddEven(2, 1); r.Err() != nil {
-		fmt.Printf("error: %s\n", r.Err())
+	if r := AddEven(2, 1); r.E() != nil {
+		fmt.Printf("error: %s\n", r.E())
 	}
 
+	AddEven(4, 2).Then(func(res int) {
+		fmt.Println("Res:", res)
+	})
+
 	fmt.Println(
-		AddEven(4, 2).Or(-1).V())
+		"adding odd numbers", AddEven(1, 2).Or(-1).V())
 }

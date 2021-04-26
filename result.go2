@@ -1,61 +1,66 @@
 package gtl
 
 // Result represents the result of a function.
-type Result[T any] struct {
-	v   T
-	err error
+//
+// A result has an expected value, which is T
+// and an unexpected value, which is E. E is often used as error.
+type Result[T, E any] struct {
+	v T
+	e Optional[E]
 }
 
-// Ok returns a Result holding a value.
-func Ok[T any](v T) Result[T] {
-	return Result[T]{
-		v: v,
-	}
+// Ok returns a Result holding an expected value.
+//
+// If `r` was previously holding an unexpected value that is discarded.
+func (r Result[T, E]) Ok(v T) Result[T, E] {
+	r.v = v
+	r.e.Drop()
+
+	return r
 }
 
-// Err returns a Result holding an error.
-func Err[T any](err error) Result[T] {
-	return Result[T]{
-		err: err,
-	}
+// Err returns a Result holding an unexpected value (an error).
+func (r Result[T, E]) Err(e E) Result[T, E] {
+	r.e.Set(e)
+
+	return r
 }
 
 // Or sets the value `v` only if the error was previously set.
 // That means: In case the Result has failed, set this alternative value.
 //
 // If the Result is holding an error, the error is cleared out and `v` is set.
-func (r Result[T]) Or(v T) Result[T] {
-	if r.err != nil {
-		r.v = v
-		r.err = nil
+func (r Result[T, E]) Or(v T) Result[T, E] {
+	if r.e.Has() {
+		r = r.Ok(v)
 	}
 
 	return r
 }
 
-// V returns the value.
-func (r Result[T]) V() T {
+// V returns the expected value.
+func (r Result[T, E]) V() T {
 	return r.v
 }
 
-// Err returns the error.
-func (r Result[T]) Err() error {
-	return r.err
+// Err returns the unexpected value.
+func (r Result[T, E]) E() E {
+	return r.e.V()
 }
 
-// Then is executed if Result is not holding any error.
-func (r Result[T]) Then(fn func(T)) Result[T] {
-	if r.err == nil {
+// Then is executed if Result is not holding an unexpected error.
+func (r Result[T, E]) Then(fn func(T)) Result[T, E] {
+	if !r.e.Has() {
 		fn(r.v)
 	}
 
 	return r
 }
 
-// Else is executed if Result is holding an error.
-func (r Result[T]) Else(fn func(error)) Result[T] {
-	if r.err != nil {
-		fn(r.err)
+// Else is executed if Result is holding an unexpected error.
+func (r Result[T, E]) Else(fn func(E)) Result[T, E] {
+	if r.e.Has() {
+		fn(r.e.V())
 	}
 
 	return r
