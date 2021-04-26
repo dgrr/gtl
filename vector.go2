@@ -1,0 +1,56 @@
+package gtl
+
+// Vector represents a slice of type `T`.
+type Vector[T any] []T
+
+// PushBack appends to the back of the vector the elements in the argument.
+func (vc *Vector[T]) PushBack(elmnts ...T) {
+	*vc = append(*vc, elmnts...)
+}
+
+// PushFront performs a move of the elements in the vector to add the elements in the argument.
+func (vc *Vector[T]) PushFront(elmnts ...T) {
+	*vc = append((*vc)[:len(elmnts)], *vc...)
+	copy(*vc, elmnts)
+}
+
+// PopBack returns the last element and removes it from the vector.
+func (vc *Vector[T]) PopBack() (e T) {
+	if len(*vc) > 0 {
+		e = (*vc)[len(*vc)-1]
+		*vc = (*vc)[:len(*vc)-1]
+	}
+
+	return
+}
+
+// PopFront returns the first elements and removes it from the vector.
+func (vc *Vector[T]) PopFront() (e T) {
+	if len(*vc) > 0 {
+		e = (*vc)[0]
+		*vc = append((*vc)[:0], (*vc)[1:]...)
+	}
+
+	return
+}
+
+// Len returns the number of elements in `vc`.
+func (vc *Vector[T]) Len() int {
+	return len(*vc)
+}
+
+// Iter returns an iterator over the vector.
+func (vc *Vector[T]) Iter() Iterator[T] {
+	it := &Iter[T, int]{
+		v: nil,
+	}
+	it.next = func(cnt int) (*T, int) {
+		if cnt < vc.Len() {
+			return &(*vc)[cnt], cnt+1
+		}
+
+		return nil, cnt+1
+	}
+
+	return it
+}

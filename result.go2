@@ -1,0 +1,62 @@
+package gtl
+
+// Result represents the result of a function.
+type Result[T any] struct {
+	v   T
+	err error
+}
+
+// Ok returns a Result holding a value.
+func Ok[T any](v T) Result[T] {
+	return Result[T]{
+		v: v,
+	}
+}
+
+// Err returns a Result holding an error.
+func Err[T any](err error) Result[T] {
+	return Result[T]{
+		err: err,
+	}
+}
+
+// Or sets the value `v` only if the error was previously set.
+// That means: In case the Result has failed, set this alternative value.
+//
+// If the Result is holding an error, the error is cleared out and `v` is set.
+func (r Result[T]) Or(v T) Result[T] {
+	if r.err != nil {
+		r.v = v
+		r.err = nil
+	}
+
+	return r
+}
+
+// V returns the value.
+func (r Result[T]) V() T {
+	return r.v
+}
+
+// Err returns the error.
+func (r Result[T]) Err() error {
+	return r.err
+}
+
+// Then is executed if Result is not holding any error.
+func (r Result[T]) Then(fn func(T)) Result[T] {
+	if r.err == nil {
+		fn(r.v)
+	}
+
+	return r
+}
+
+// Else is executed if Result is holding an error.
+func (r Result[T]) Else(fn func(error)) Result[T] {
+	if r.err != nil {
+		fn(r.err)
+	}
+
+	return r
+}

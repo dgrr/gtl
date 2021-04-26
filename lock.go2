@@ -1,0 +1,20 @@
+package gtl
+
+import "sync"
+
+// Locker wraps `T` with a sync.Locker.
+type Locker[T any] struct {
+	v T
+	sync.Locker
+}
+
+func NewLocker[T any](lck sync.Locker) *Locker[T] {
+	return &Locker[T]{
+		Locker: lck,
+	}
+}
+
+// V returns a pointer to `T`.
+func (lck *Locker[T]) V() *T {
+	return &lck.v
+}

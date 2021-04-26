@@ -1,0 +1,31 @@
+package main
+
+import (
+	"sort"
+	"fmt"
+	"math/rand"
+
+	"github.com/dgrr/gtl"
+)
+
+func main() {
+	var vec gtl.Vector[int]
+
+	for i := 0; i < 20; i++ {
+		vec.PushBack(
+			rand.Intn(100))
+	}
+
+	sort.Slice(vec, func(i, j int) bool {
+		return vec[i] < vec[j]
+	})
+
+	for vec.Len() != 0 {
+		fmt.Println(
+			vec.PopFront())
+	}
+
+	vec.PushFront(-20)
+
+	fmt.Println("last value", vec.PopFront())
+}

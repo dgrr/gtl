@@ -1,0 +1,28 @@
+package main
+
+import (
+	"fmt"
+	"sync"
+
+	"github.com/dgrr/gtl"
+)
+
+func main() {
+	var wg sync.WaitGroup
+
+	vec := gtl.NewLocker[gtl.Vector[int]](&sync.Mutex{})
+
+	for i := 0; i < 20; i++ {
+		wg.Add(1)
+		go func(i int) {
+			vec.Lock()
+			vec.V().PushBack(i)
+			vec.Unlock()
+			wg.Done()
+		}(i)
+	}
+
+	wg.Wait()
+
+	fmt.Println("last value", vec.V())
+}

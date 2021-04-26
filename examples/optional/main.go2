@@ -1,0 +1,18 @@
+package main
+
+import (
+	"fmt"
+
+	"github.com/dgrr/gtl"
+)
+
+func main() {
+	var v gtl.Optional[int]
+
+	v.Set(20)
+
+	fmt.Println(v.Has(), v.V())
+
+	v.Drop()
+	fmt.Println(v.Has(), v.V())
+}

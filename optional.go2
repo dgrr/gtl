@@ -1,0 +1,34 @@
+package gtl
+
+// Optional defines an optional object.
+type Optional[T any] struct {
+	v *T
+}
+
+// V returns the held value if it has been defined previously.
+func (opt *Optional[T]) V() (v T) {
+	if opt.v != nil {
+		v = *opt.v
+	}
+
+	return
+}
+
+// Has returns true if Optional is holding a value.
+func (opt *Optional[T]) Has() bool {
+	return opt.v != nil
+}
+
+// Set sets the value to the optional struct.
+func (opt *Optional[T]) Set(v T) {
+	if opt.v == nil {
+		opt.v = new(T)
+	}
+
+	*opt.v = v
+}
+
+// Drop drops any previously set value.
+func (opt *Optional[T]) Drop() {
+	opt.v = nil
+}

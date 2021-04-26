@@ -1,0 +1,36 @@
+package gtl
+
+// Iterator defines an interface for iterative objects.
+type Iterator[T any] interface {
+	// Next increments the iterator.
+	Next() bool
+	// V returns the value held in the iterator.
+	V() T
+}
+
+// Iter implements the Iterator[T] interface.
+//
+// The iterator might not be directly used by the user, but as a mean
+// to iterate over gtl defined data structures.
+//
+// T defines the object held by the Iterator.
+// T2 is any object that keeps the previous state in order to
+// help the iterator to move forward. For example, a vector might use as T2
+// an integer, to be used as index for accessing the next element.
+type Iter[T, T2 any] struct {
+	v    *T
+	cnt  T2
+	next func(T2) (*T, T2)
+}
+
+// Next advances the iterator pointer.
+func (it *Iter[T, T2]) Next() bool {
+	it.v, it.cnt = it.next(it.cnt)
+
+	return it.v != nil
+}
+
+// V returns the value held in the iterator.
+func (it *Iter[T, T2]) V() T {
+	return *it.v
+}
