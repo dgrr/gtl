@@ -49,6 +49,29 @@ func main() {
 }
 ```
 
+### Optional
+
+Optional represents an optional value. In C++ we have the [std::optional](https://en.cppreference.com/w/cpp/utility/optional)
+which might be similar.
+
+A valid usage would be:
+```go
+func myFunc() (o gtl.Optional[int]) {
+	if n := rand.Int(); n % 2 == 0 { // is even
+		o.Set(n)
+	}
+	
+	return o
+}
+
+func main() {
+	value := myFunc()
+	if value.Has() {
+		fmt.Printf("Got: %d\n", value.V())
+	}
+}
+```
+
 ### Iterator
 
 Iterator tries to emulate a [C++'s iterator](https://en.cppreference.com/w/cpp/iterator/iterator).
@@ -90,5 +113,18 @@ func main() {
         })
 
         fmt.Println(vec)
+}
+```
+
+### Locker
+
+A Locker defines a helper structure to facilitate Lock and Unlock wrappers.
+
+```go
+func main() {
+	lck := NewLocker[int](&sync.Mutex{})
+	lck.Set(20)
+	
+	fmt.Println(*lck.V())
 }
 ```
