@@ -12,18 +12,18 @@ You can learn more about Golang's generics [here](https://go.googlesource.com/pr
 
 Result tries to emulate [Rust's result](https://doc.rust-lang.org/std/result/).
 
-gtl provides functions like `Ok` or `Err` to return the proper Result. After getting the result,
-we manage the [Result](https://github.com/dgrr/gtl/blob/master/result.go2#L4) in different ways.
+After getting the returned value,
+we can manage the [Result](https://github.com/dgrr/gtl/blob/master/result.go2#L4) in different ways.
 
 A valid usage would be:
 ```go
-func Do() gtl.Result[string] {
+func Do() (r gtl.Result[string, error]) {
   if rand.Intn(100) & 1 == 0 { // is even?
-    return gtl.Err[string](
+    return r.Err(
       errors.New("unexpected result"))
   }
   
-  return gtl.Ok("Success")
+  return r.Ok("Success")
 }
 
 func main() {
@@ -36,19 +36,12 @@ func main() {
 ```
 
 `Then` is executed if `Do` returned the call to `Ok`. `Ok` will store the string `"Success"`
-into the Result's value. In the other hand, `Else` will be executed if `Err` has been called.
-As the compiler is not (yet) smart enough, when calling `Err` we need to specify the return type (`string`),
-because it is not able to deduce it by itself.
+into the Result's expected value. In the other hand, `Else` will be executed if `Err` has been called.
 
 If we don't want to handle errors but we just want to get the value, we can do the following:
 ```go
-func Do() gtl.Result[string] {
-  if rand.Intn(100) & 1 == 0 { // is even?
-    return gtl.Err[string](
-      errors.New("unexpected result"))
-  }
-  
-  return gtl.Ok("Success")
+func Do() (r gtl.Result[string, error]) {
+  // assume Do() didn't change
 }
 
 func main() {
