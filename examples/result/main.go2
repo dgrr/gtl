@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"fmt"
 	"errors"
 
@@ -17,6 +18,14 @@ func AddEven(a, b int) (r gtl.Result[int, error]) {
 }
 
 func main() {
+	s := "19oo"
+
+ 	r := gtl.ResultFrom(
+		strconv.ParseInt(s, 10, 64)).Or(-1)
+	if r.V() == -1 {
+		fmt.Printf("%s conversion failed\n", s)
+	}
+
 	if r := AddEven(2, 1); r.E() != nil {
 		fmt.Printf("error: %s\n", r.E())
 	}
