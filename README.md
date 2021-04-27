@@ -6,11 +6,17 @@ or they are cumbersome if generics are not present (using interface{} as replace
 
 You can learn more about Golang's generics [here](https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md).
 
-## Data Structures
+# Table of Contents
+1. [Result](#result)
+2. [Optional](#optional)
+3. [Iterator](#iterator)
+4. [Vector](#vector)
+5. [Locker](#locker)
 
-### Result
+## Result
 
 Result tries to emulate [Rust's result](https://doc.rust-lang.org/std/result/).
+But being honest, it is more similar to [std::expected](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r3.pdf) from C++.
 
 After getting the returned value,
 we can manage the [Result](https://github.com/dgrr/gtl/blob/master/result.go2#L4) in different ways.
@@ -49,7 +55,30 @@ func main() {
 }
 ```
 
-### Iterator
+## Optional
+
+Optional represents an optional value. In C++ we have the [std::optional](https://en.cppreference.com/w/cpp/utility/optional)
+which might be similar.
+
+A valid usage would be:
+```go
+func myFunc() (o gtl.Optional[int]) {
+	if n := rand.Int(); n % 2 == 0 { // is even
+		o.Set(n)
+	}
+	
+	return o
+}
+
+func main() {
+	value := myFunc()
+	if value.Has() {
+		fmt.Printf("Got: %d\n", value.V())
+	}
+}
+```
+
+## Iterator
 
 Iterator tries to emulate a [C++'s iterator](https://en.cppreference.com/w/cpp/iterator/iterator).
 It is defined as follows:
@@ -62,7 +91,7 @@ type Iterator[T any] interface {
 
 The iterator then has 2 functions, one for incrementing the iterator and another for getting the underlying value.
 
-### Vector
+## Vector
 
 Vector tries to emulate a [C++'s vector](https://en.cppreference.com/w/cpp/container/vector) (somehow).
 It doesn't try to emulate it exactly, but it just works as a C++ vector in a way that internally is just
@@ -90,5 +119,18 @@ func main() {
         })
 
         fmt.Println(vec)
+}
+```
+
+## Locker
+
+A Locker defines a helper structure to facilitate Lock and Unlock wrappers.
+
+```go
+func main() {
+	lck := NewLocker[int](&sync.Mutex{})
+	lck.Set(20)
+	
+	fmt.Println(*lck.V())
 }
 ```

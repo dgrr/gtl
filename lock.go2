@@ -18,3 +18,10 @@ func NewLocker[T any](lck sync.Locker) *Locker[T] {
 func (lck *Locker[T]) V() *T {
 	return &lck.v
 }
+
+// Set sets the value wrapping the assign with the Lock and Unlock calls.
+func (lck *Locker[T]) Set(v T) {
+	lck.Lock()
+	lck.v = v
+	lck.Unlock()
+}
