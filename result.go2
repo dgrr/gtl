@@ -30,10 +30,25 @@ func (r Result[T, E]) Ok(v T) Result[T, E] {
 	return r
 }
 
+// IsOk returns whether the Result has the unexpected value set or not.
+func (r Result[T, E]) IsOk() bool {
+	return !r.e.Has()
+}
+
 // Err returns a Result holding an unexpected value (an error).
 func (r Result[T, E]) Err(e E) Result[T, E] {
 	r.e.Set(e)
 
+	return r
+}
+
+// Any takes from input either T or E. If E is defined, V is not used.
+func (r Result[T, E]) Any(v T, e E) Result[T, E] {
+	r.e.Set(e)
+	if !r.e.Has() {
+		r.v = v
+	}
+	
 	return r
 }
 
@@ -68,6 +83,17 @@ func (r Result[T, E]) VE() (T, E) {
 func (r Result[T, E]) Then(fn func(T)) Result[T, E] {
 	if !r.e.Has() {
 		fn(r.v)
+	}
+
+	return r
+}
+
+// ThenE is executed if Result is not holding an unexpected error.
+//
+// The function must return a type E.
+func (r Result[T, E]) ThenE(fn func(T) E) Result[T, E] {
+	if !r.e.Has() {
+		r.e.Set(fn(r.v))
 	}
 
 	return r
