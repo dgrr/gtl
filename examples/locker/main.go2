@@ -10,13 +10,14 @@ import (
 func main() {
 	var wg sync.WaitGroup
 
-	vec := gtl.NewLocker[gtl.Vector[int]](&sync.Mutex{})
+	vec := gtl.NewLocker(
+		gtl.NewVec[int](), &sync.Mutex{})
 
 	for i := 0; i < 20; i++ {
 		wg.Add(1)
 		go func(i int) {
 			vec.Lock()
-			vec.V().PushBack(i)
+			vec.V().Append(i)
 			vec.Unlock()
 			wg.Done()
 		}(i)

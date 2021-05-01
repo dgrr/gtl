@@ -6,22 +6,22 @@ import (
 	"github.com/dgrr/gtl"
 )
 
-func myFunc(shouldHave bool) (o gtl.Optional[int]) {
+func myFunc(shouldHave bool) (op gtl.Optional[int]) {
 	if shouldHave {
-		o.Set(20)
+		op.Set(20)
 	}
 	
-	return o
+	return op
 }
 
 func main() {
 	v := myFunc(true)
-	if v.Has() {
+	if v.Ok() {
 		fmt.Println("has value", v.V())
 	} else {
 		v.Set(20)
 	}
 
 	v.Drop()
-	fmt.Println("after drop:", v.Has(), v.V())
+	fmt.Println("after drop:", v.Ok(), v.V())
 }

@@ -19,13 +19,18 @@ type Iterator[T any] interface {
 // an integer, to be used as index for accessing the next element.
 type Iter[T, T2 any] struct {
 	v    *T
-	cnt  T2
+	index  T2
 	next func(T2) (*T, T2)
+}
+
+// Index returns the index used in the iterator.
+func (it *Iter[T, T2]) Index() T2 {
+	return it.index
 }
 
 // Next advances the iterator pointer.
 func (it *Iter[T, T2]) Next() bool {
-	it.v, it.cnt = it.next(it.cnt)
+	it.v, it.index = it.next(it.index)
 
 	return it.v != nil
 }

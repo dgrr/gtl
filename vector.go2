@@ -61,6 +61,10 @@ func (vc *Vec[T]) Len() int {
 
 // Iter returns an iterator over the vector.
 func (vc *Vec[T]) Iter() Iterator[T] {
+	return vc.iter()
+}
+
+func (vc *Vec[T]) iter() *Iter[T, int] {
 	it := &Iter[T, int]{
 		v: nil,
 	}
@@ -73,4 +77,17 @@ func (vc *Vec[T]) Iter() Iterator[T] {
 	}
 
 	return it
+}
+
+// Search ...
+func (vc *Vec[T]) Search(cmpFn func(it Iterator[T]) bool) int {
+	i := -1
+	for it := vc.iter(); it.Next(); {
+		if cmpFn(it) {
+			i = it.Index()
+			break
+		}
+	}
+
+	return i
 }

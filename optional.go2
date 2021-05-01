@@ -5,17 +5,23 @@ type Optional[T any] struct {
 	v *T
 }
 
+func NewOptional[T any](v *T) Optional[T] {
+	return Optional[T]{
+		v: v,
+	}
+}
+
 // V returns the held value if it has been defined previously.
-func (opt *Optional[T]) V() (v T) {
-	if opt != nil && opt.v != nil {
+func (opt Optional[T]) V() (v T) {
+	if opt.v != nil {
 		v = *opt.v
 	}
 
 	return
 }
 
-// Has returns true if Optional is holding a value.
-func (opt *Optional[T]) Has() bool {
+// Ok returns true if Optional is holding a value.
+func (opt Optional[T]) Ok() bool {
 	return opt.v != nil
 }
 

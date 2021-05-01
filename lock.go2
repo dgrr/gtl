@@ -8,8 +8,13 @@ type Locker[T any] struct {
 	sync.Locker
 }
 
-func NewLocker[T any](lck sync.Locker) *Locker[T] {
+func NewLocker[T any](v T, lck sync.Locker) *Locker[T] {
+	if lck == nil {
+		lck = &sync.Mutex{}
+	}
+
 	return &Locker[T]{
+		v: v,
 		Locker: lck,
 	}
 }

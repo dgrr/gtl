@@ -9,9 +9,9 @@ type Result[T, E any] struct {
 	e Optional[E]
 }
 
-// ResultFrom returns a Result from 2 values. It is useful when we want
+// NewResult returns a Result from 2 values. It is useful when we want
 // to capture old-style function returning.
-func ResultFrom[T any](v T, err error) (r Result[T, error]) {
+func NewResult[T any](v T, err error) (r Result[T, error]) {
 	r.v = v
 	if err != nil {
 		r.e.Set(err)
@@ -32,7 +32,7 @@ func (r Result[T, E]) Ok(v T) Result[T, E] {
 
 // IsOk returns whether the Result has the unexpected value set or not.
 func (r Result[T, E]) IsOk() bool {
-	return !r.e.Has()
+	return !r.e.Ok()
 }
 
 // Err returns a Result holding an unexpected value (an error).
@@ -45,7 +45,7 @@ func (r Result[T, E]) Err(e E) Result[T, E] {
 // Any takes from input either T or E. If E is defined, V is not used.
 func (r Result[T, E]) Any(v T, e E) Result[T, E] {
 	r.e.Set(e)
-	if !r.e.Has() {
+	if !r.e.Ok() {
 		r.v = v
 	}
 	
@@ -57,7 +57,7 @@ func (r Result[T, E]) Any(v T, e E) Result[T, E] {
 //
 // If the Result is holding an error, the error is cleared out and `v` is set.
 func (r Result[T, E]) Or(v T) Result[T, E] {
-	if r.e.Has() {
+	if r.e.Ok() {
 		r = r.Ok(v)
 	}
 
@@ -69,7 +69,7 @@ func (r Result[T, E]) V() T {
 	return r.v
 }
 
-// Err returns the unexpected value.
+// E returns the unexpected value.
 func (r Result[T, E]) E() E {
 	return r.e.V()
 }
@@ -81,7 +81,7 @@ func (r Result[T, E]) VE() (T, E) {
 
 // Then is executed if Result is not holding an unexpected error.
 func (r Result[T, E]) Then(fn func(T)) Result[T, E] {
-	if !r.e.Has() {
+	if !r.e.Ok() {
 		fn(r.v)
 	}
 
@@ -92,7 +92,7 @@ func (r Result[T, E]) Then(fn func(T)) Result[T, E] {
 //
 // The function must return a type E.
 func (r Result[T, E]) ThenE(fn func(T) E) Result[T, E] {
-	if !r.e.Has() {
+	if !r.e.Ok() {
 		r.e.Set(fn(r.v))
 	}
 
@@ -101,7 +101,7 @@ func (r Result[T, E]) ThenE(fn func(T) E) Result[T, E] {
 
 // Else is executed if Result is holding an unexpected error.
 func (r Result[T, E]) Else(fn func(E)) Result[T, E] {
-	if r.e.Has() {
+	if r.e.Ok() {
 		fn(r.e.V())
 	}
 

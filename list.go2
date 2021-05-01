@@ -32,7 +32,7 @@ func (lst *List[T]) PopFront() (v T) {
 // Iter returns an iterator for the linked list.
 func (lst *List[T]) Iter() Iterator[T] {
 	iter := &Iter[T, *element[T]]{
-		cnt: lst.next,
+		index: lst.next,
 		next: func(prev *element[T]) (*T, *element[T]) {
 			if prev == nil {
 				return nil, nil
