@@ -29,9 +29,10 @@ func BytesFrom(bts []byte) Bytes {
 // But `max` can be <= 0. If so, calling Slice is
 // equivalent to `b[low:]`.
 func (b Bytes) Slice(low, max int) Bytes {
-	if max >= 0 {
+	if max <= 0 {
 		return b[low:]
 	}
+
 	return b[low:max]
 }
 
@@ -53,6 +54,19 @@ func (b Bytes) ReadFrom(r io.Reader) (int64, error) {
 	n, err := r.Read(b)
 
 	return int64(n), err
+}
+
+// LimitReadFrom reads a limited amount from `r` to `b`.
+//
+// If `n` is greater than `b`'s len, b will be resized.
+func (b *Bytes) LimitReadFrom(r io.Reader, n int) (int64, error) {
+	b.Resize(n)
+	return b.Slice(0, n).ReadFrom(r)
+}
+
+// LimitWriteTo writes a limited amount from `b` to `w`.
+func (b Bytes) LimitWriteTo(w io.Writer, n int) (int64, error) {
+	return b.Slice(0, Min(b.Len(), n)).WriteTo(w)
 }
 
 // Len returns the length of Bytes.
