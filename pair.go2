@@ -16,7 +16,7 @@ func NewPair[T, U any](t T, u U) Pair[T, U] {
 
 // Swap returns a Pair swapping both values.
 func (p Pair[T, U]) Swap() Pair[U, T] {
-	return MakePair(p.u, p.t)
+	return NewPair(p.u, p.t)
 }
 
 // T returns the first value.
