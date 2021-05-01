@@ -6,8 +6,8 @@ type Vec[T any] []T
 // NewVec returns a new Vec.
 //
 // If `elmnts` is defined, the contents will be append.
-func NewVec[T any](elmnts ...T) *Vec[T] {
-	vc := &Vec[T]{}
+func NewVec[T any](elmnts ...T) Vec[T] {
+	vc := Vec[T]{}
 	vc.Append(elmnts...)
 
 	return vc

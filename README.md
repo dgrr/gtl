@@ -110,9 +110,7 @@ import (
 )
 
 func main() {
-        var vec gtl.Vector[string]
-
-        vec.PushBack(os.Args[1:]...)
+        vec := gtl.NewVec(os.Args[1:]...)
 
         sort.Slice(vec, func(i, j int) bool {
                 return vec[i] < vec[j]
