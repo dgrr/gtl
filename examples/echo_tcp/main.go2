@@ -1,0 +1,106 @@
+package main
+
+import (
+	"fmt"
+	"io"
+	"log"
+	"net"
+	"os"
+	"os/signal"
+
+	"github.com/dgrr/gtl"
+)
+
+func main() {
+	if err := start(); err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func start() error {
+	return gtl.NewResult(
+		net.Listen("tcp", ":42421"),
+	).ThenE(func(ln net.Listener) error {
+		s := Server{
+			ln: ln,
+			conns: gtl.NewLocker[gtl.Vec[net.Conn]](),
+		}
+		go s.handleSignals()
+
+		for {
+			r := gtl.NewResult(
+				ln.Accept(),
+			).Then(func(c net.Conn) {
+				s.conns.Lock()
+				s.conns.Ptr().Append(c)
+				s.conns.Unlock()
+
+				go s.handleConn(c)
+			})
+
+			if !r.IsOk() {
+				return r.E()
+			}
+		}
+	}).E()
+}
+
+type Server struct {
+	ln net.Listener
+	conns *gtl.Locker[gtl.Vec[net.Conn]]
+}
+
+func (s *Server) handleSignals() {
+	sch := make(chan os.Signal, 1)
+
+	signal.Notify(sch, os.Interrupt)
+
+	select {
+	case <-sch:
+	}
+
+	signal.Stop(sch)
+	close(sch)
+
+	for it := s.conns.V().Iter(); it.Next(); {
+		it.V().Close()
+	}
+
+	s.ln.Close()
+}
+
+func (s *Server) handleConn(c net.Conn) {
+	b := gtl.NewBytes(128, 128)
+
+	defer func() {
+		s.conns.Lock()
+
+		it := s.conns.V().Search(func(it gtl.Iterator[net.Conn]) bool {
+			return it.V() == c
+		})
+		if it != nil && s.conns.Ptr().Del(it) {
+			log.Printf("Removed: %s\n", it.V().RemoteAddr())
+		}
+
+		s.conns.Unlock()
+	}()
+
+	for {
+		r := gtl.NewResult(
+			b.ReadFrom(c),
+		).ThenE(func(n int64) error {
+			i := b.Index('\n')
+
+			fmt.Printf("Recv: %s\n", b.Slice(0, i))
+
+			return gtl.NewResult(
+				b.LimitWriteTo(c, int(n))).E()
+		})
+		if !r.IsOk() {
+			if r.E() != io.EOF {
+				log.Printf("error reading from %s: %s", c.RemoteAddr(), r.E())
+			}
+			break
+		}
+	}
+}

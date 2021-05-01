@@ -20,17 +20,6 @@ func NewResult[T any](v T, err error) (r Result[T]) {
 	return r
 }
 
-var _ error = Result[struct{}]{}
-
-// Error satisfies the error interface.
-func (r Result[T]) Error() (s string) {
-	if r.e != nil {
-		s = r.e.Error()
-	}
-
-	return
-}
-
 // Ok returns a Result holding an expected value.
 //
 // If `r` was previously holding an unexpected value that is discarded.

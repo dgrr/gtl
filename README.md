@@ -11,7 +11,8 @@ You can learn more about Golang's generics [here](https://go.googlesource.com/pr
 2. [Optional](#optional)
 3. [Iterator](#iterator)
 4. [Vector](#vector)
-5. [Locker](#locker)
+5. [Bytes](#bytes)
+6. [Locker](#locker)
 
 ## Result
 
@@ -121,6 +122,12 @@ func main() {
         fmt.Println(vec)
 }
 ```
+
+## Bytes
+
+Bytes is a helper for working with byte slices.
+
+
 
 ## Locker
 

@@ -4,18 +4,19 @@ import "sync"
 
 // Locker wraps `T` with a sync.Locker.
 type Locker[T any] struct {
+	sync.Mutex
 	v T
-	sync.Locker
 }
 
-func NewLocker[T any](v T, lck sync.Locker) *Locker[T] {
-	if lck == nil {
-		lck = &sync.Mutex{}
+// NewLocker returns a NewLocker.
+func NewLocker[T any](vs ...T) *Locker[T] {
+	var v T
+	if len(vs) != 0 {
+		v = vs[0]
 	}
 
 	return &Locker[T]{
 		v: v,
-		Locker: lck,
 	}
 }
 
@@ -24,8 +25,8 @@ func (lck *Locker[T]) V() T {
 	return lck.v
 }
 
-// VPtr returns a pointer to `T`.
-func (lck *Locker[T]) VPtr() *T {
+// Ptr returns a pointer to `T`.
+func (lck *Locker[T]) Ptr() *T {
 	return &lck.v
 }
 

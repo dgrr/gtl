@@ -8,6 +8,8 @@ type Iterator[T any] interface {
 	Advance(n int) bool
 	// V returns the value held in the iterator.
 	V() T
+	// Ptr returns a pointer to T.
+	Ptr() *T
 }
 
 // Iter implements the Iterator[T] interface.
@@ -21,6 +23,7 @@ type Iterator[T any] interface {
 // an integer, to be used as index for accessing the next element.
 type Iter[T, T2 any] struct {
 	v       *T
+	prev    T2
 	index   T2
 	next    func(T2) (*T, T2)
 	advance func(T2, int) (*T, T2)
@@ -28,11 +31,12 @@ type Iter[T, T2 any] struct {
 
 // Index returns the index used in the iterator.
 func (it *Iter[T, T2]) Index() T2 {
-	return it.index
+	return it.prev
 }
 
 // Next advances the iterator pointer.
 func (it *Iter[T, T2]) Next() bool {
+	it.prev = it.index
 	it.v, it.index = it.next(it.index)
 
 	return it.v != nil
@@ -47,4 +51,9 @@ func (it *Iter[T, T2]) Advance(n int) bool {
 // V returns the value held in the iterator.
 func (it *Iter[T, T2]) V() T {
 	return *it.v
+}
+
+// Ptr returns a pointer to the value held in the iterator.
+func (it *Iter[T, T2]) Ptr() *T {
+	return it.v
 }
