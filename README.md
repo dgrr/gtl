@@ -18,12 +18,14 @@ You can learn more about Golang's generics [here](https://go.googlesource.com/pr
 Result tries to emulate [Rust's result](https://doc.rust-lang.org/std/result/).
 But being honest, it is more similar to [std::expected](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r3.pdf) from C++.
 
+As Golang already has a type for defining errors, the second type is replaced with the error.
+
 After getting the returned value,
 we can manage the [Result](https://github.com/dgrr/gtl/blob/master/result.go2#L4) in different ways.
 
 A valid usage would be:
 ```go
-func Do() (r gtl.Result[string, error]) {
+func Do() (r gtl.Result[string]) {
   if rand.Intn(100) & 1 == 0 { // is even?
     return r.Err(
       errors.New("unexpected result"))
