@@ -3,15 +3,35 @@ package gtl
 // Vector represents a slice of type `T`.
 type Vector[T any] []T
 
-// PushBack appends to the back of the vector the elements in the argument.
-func (vc *Vector[T]) PushBack(elmnts ...T) {
+// NewVector returns a new Vector.
+//
+// If `elmnts` is defined, the contents will be append.
+func NewVector[T any](elmnts ...T) *Vector[T] {
+	vc := &Vector[T]{}
+	vc.Append(elmnts...)
+
+	return vc
+}
+
+// Append appends `elmnts` to the end of the vector.
+func (vc *Vector[T]) Append(elmnts ...T) {
 	*vc = append(*vc, elmnts...)
 }
 
-// PushFront performs a move of the elements in the vector to add the elements in the argument.
-func (vc *Vector[T]) PushFront(elmnts ...T) {
+// Push pushes the `elmnts` into the first positions of the vector.
+func (vc *Vector[T]) Push(elmnts ...T) {
 	*vc = append((*vc)[:len(elmnts)], *vc...)
 	copy(*vc, elmnts)
+}
+
+// Front returns a pointer to the first element of the vector.
+func (vc *Vector[T]) Front() *T {
+	return &(*vc)[0]
+}
+
+// Back returns a pointer to the last element of the vector.
+func (vc *Vector[T]) Back() *T {
+	return &(*vc)[vc.Len()-1]
 }
 
 // PopBack returns the last element and removes it from the vector.
