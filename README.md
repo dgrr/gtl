@@ -95,7 +95,7 @@ type Iterator[T any] interface {
 
 The iterator then has 2 functions, one for incrementing the iterator and another for getting the underlying value.
 
-## Vec
+## Vector
 
 Vec tries to emulate a [C++'s vector](https://en.cppreference.com/w/cpp/container/vector) (somehow).
 It doesn't try to emulate it exactly, but it just works as a C++ vector in a way that internally is just
