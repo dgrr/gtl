@@ -2,6 +2,7 @@ package gtl
 
 import (
 	"bytes"
+	"io"
 )
 
 // Bytes defines a `Vec` of the type byte.
@@ -21,6 +22,16 @@ func BytesFrom(bts []byte) Bytes {
 func (b *Bytes) CopyFrom(b2 Bytes) {
 	b.Resize(b2.Len())
 	copy(*b, b2)
+}
+
+// WriteTo writes the bytes from `b` to `w`.
+func (b Bytes) WriteTo(w io.Writer) (int, error) {
+	return w.Write(b)
+}
+
+// ReadFrom reads the contents from `r` to `b`.
+func (b *Bytes) ReadFrom(r io.Reader) (int, error) {
+	return r.Read(*b)
 }
 
 // Len returns the length of Bytes.
