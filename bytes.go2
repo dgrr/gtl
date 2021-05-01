@@ -8,6 +8,11 @@ import (
 // Bytes defines a `Vec` of the type byte.
 type Bytes Vec[byte]
 
+var (
+	_ io.WriterTo = Bytes{}
+	_ io.ReaderFrom = &Bytes{}
+)
+
 // NewBytes creates a new `Bytes` with a len and cap
 func NewBytes(len, cap int) Bytes {
 	return BytesFrom(make([]byte, len, cap))
@@ -25,13 +30,17 @@ func (b *Bytes) CopyFrom(b2 Bytes) {
 }
 
 // WriteTo writes the bytes from `b` to `w`.
-func (b Bytes) WriteTo(w io.Writer) (int, error) {
-	return w.Write(b)
+func (b Bytes) WriteTo(w io.Writer) (int64, error) {
+	n, err := w.Write(b)
+
+	return int64(n), err
 }
 
 // ReadFrom reads the contents from `r` to `b`.
-func (b *Bytes) ReadFrom(r io.Reader) (int, error) {
-	return r.Read(*b)
+func (b *Bytes) ReadFrom(r io.Reader) (int64, error) {
+	n, err := r.Read(*b)
+
+	return int64(n), err
 }
 
 // Len returns the length of Bytes.
