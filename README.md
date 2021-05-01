@@ -13,6 +13,7 @@ You can learn more about Golang's generics [here](https://go.googlesource.com/pr
 4. [Vector](#vector)
 5. [Bytes](#bytes)
 6. [Locker](#locker)
+7. [Numeric](#numeric)
 
 ## Result
 
@@ -127,7 +128,7 @@ func main() {
 
 Bytes is a helper for working with byte slices.
 
-
+You can see an example of how to use Bytes [here](https://github.com/dgrr/gtl/blob/2642e2ac98bd8a8fbfbc3e9789d4b87bf6e6e317/examples/echo_tcp/main.go2#L73).
 
 ## Locker
 
@@ -135,9 +136,20 @@ A Locker defines a helper structure to facilitate Lock and Unlock wrappers.
 
 ```go
 func main() {
-	lck := NewLocker[int](&sync.Mutex{})
+	lck := NewLocker[int]()
 	lck.Set(20)
 	
-	fmt.Println(*lck.V())
+	fmt.Println(lck.V())
+	
+	lck.Lock()
+	*lck.Ptr() += 20
+	lck.Unlock()
+	
+	fmt.Println(lck.V())
 }
 ```
+
+### Numeric
+
+There are global numeric helper functions like [Max](https://github.com/dgrr/gtl/blob/b5b6ba36de904e757d00f78351c577a6ad0547e1/numeric.go2#L9)
+and [Min](https://github.com/dgrr/gtl/blob/b5b6ba36de904e757d00f78351c577a6ad0547e1/numeric.go2#L19).

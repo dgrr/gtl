@@ -33,13 +33,23 @@ func (vc *Vec[T]) Push(elmnts ...T) {
 	copy(*vc, elmnts)
 }
 
-// Front returns a pointer to the first element of the vector.
-func (vc Vec[T]) Front() *T {
+// Front returns the first element of the vector.
+func (vc Vec[T]) Front() T {
+	return vc[0]
+}
+
+// FrontPtr returns a pointer to the first element of the vector.
+func (vc Vec[T]) FrontPtr() *T {
 	return &vc[0]
 }
 
-// Back returns a pointer to the last element of the vector.
-func (vc Vec[T]) Back() *T {
+// Back returns the last element of the vector.
+func (vc Vec[T]) Back() T {
+	return vc[vc.Len()-1]
+}
+
+// BackPtr returns a pointer to the last element of the vector.
+func (vc Vec[T]) BackPtr() *T {
 	return &vc[vc.Len()-1]
 }
 
