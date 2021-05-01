@@ -1,22 +1,27 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/dgrr/gtl"
 )
 
 func main() {
-	data := []byte("Hello world\r\n1234")
+	data := bytes.NewReader(
+		[]byte("Hello world\r\n1234"))
 
 	b := gtl.Bytes{}
 	fmt.Println("len", b.Len())
 
-	b.Resize(len(data))
+	b.Resize(32)
 
 	fmt.Println("len after resize", b.Len())
 
-	b.CopyFrom(data)
+	_, err := b.ReadFrom(data)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Println(b.Index('0'))
 	fmt.Println(

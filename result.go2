@@ -4,48 +4,58 @@ package gtl
 //
 // A result has an expected value, which is T
 // and an unexpected value, which is E. E is often used as error.
-type Result[T, E any] struct {
+type Result[T any] struct {
 	v T
-	e Optional[E]
+	e error
 }
 
 // NewResult returns a Result from 2 values. It is useful when we want
 // to capture old-style function returning.
-func NewResult[T any](v T, err error) (r Result[T, error]) {
+func NewResult[T any](v T, err error) (r Result[T]) {
 	r.v = v
 	if err != nil {
-		r.e.Set(err)
+		r.e = err
 	}
 
 	return r
 }
 
+var _ error = Result[struct{}]{}
+
+// Error satisfies the error interface.
+func (r Result[T]) Error() (s string) {
+	if r.e != nil {
+		s = r.e.Error()
+	}
+
+	return
+}
+
 // Ok returns a Result holding an expected value.
 //
 // If `r` was previously holding an unexpected value that is discarded.
-func (r Result[T, E]) Ok(v T) Result[T, E] {
+func (r Result[T]) Ok(v T) Result[T] {
 	r.v = v
-	r.e.Drop()
 
 	return r
 }
 
 // IsOk returns whether the Result has the unexpected value set or not.
-func (r Result[T, E]) IsOk() bool {
-	return !r.e.Ok()
+func (r Result[T]) IsOk() bool {
+	return r.e == nil
 }
 
 // Err returns a Result holding an unexpected value (an error).
-func (r Result[T, E]) Err(e E) Result[T, E] {
-	r.e.Set(e)
+func (r Result[T]) Err(e error) Result[T] {
+	r.e = e
 
 	return r
 }
 
 // Any takes from input either T or E. If E is defined, V is not used.
-func (r Result[T, E]) Any(v T, e E) Result[T, E] {
-	r.e.Set(e)
-	if !r.e.Ok() {
+func (r Result[T]) Any(v T, e error) Result[T] {
+	r.e = e
+	if e == nil {
 		r.v = v
 	}
 	
@@ -56,8 +66,8 @@ func (r Result[T, E]) Any(v T, e E) Result[T, E] {
 // That means: In case the Result has failed, set this alternative value.
 //
 // If the Result is holding an error, the error is cleared out and `v` is set.
-func (r Result[T, E]) Or(v T) Result[T, E] {
-	if r.e.Ok() {
+func (r Result[T]) Or(v T) Result[T] {
+	if r.e == nil {
 		r = r.Ok(v)
 	}
 
@@ -65,23 +75,23 @@ func (r Result[T, E]) Or(v T) Result[T, E] {
 }
 
 // V returns the expected value.
-func (r Result[T, E]) V() T {
+func (r Result[T]) V() T {
 	return r.v
 }
 
 // E returns the unexpected value.
-func (r Result[T, E]) E() E {
-	return r.e.V()
+func (r Result[T]) E() error {
+	return r.e
 }
 
 // VE returns V and E.
-func (r Result[T, E]) VE() (T, E) {
+func (r Result[T]) VE() (T, error) {
 	return r.V(), r.E()
 }
 
 // Then is executed if Result is not holding an unexpected error.
-func (r Result[T, E]) Then(fn func(T)) Result[T, E] {
-	if !r.e.Ok() {
+func (r Result[T]) Then(fn func(T)) Result[T] {
+	if r.e == nil {
 		fn(r.v)
 	}
 
@@ -91,18 +101,18 @@ func (r Result[T, E]) Then(fn func(T)) Result[T, E] {
 // ThenE is executed if Result is not holding an unexpected error.
 //
 // The function must return a type E.
-func (r Result[T, E]) ThenE(fn func(T) E) Result[T, E] {
-	if !r.e.Ok() {
-		r.e.Set(fn(r.v))
+func (r Result[T]) ThenE(fn func(T) error) Result[T] {
+	if r.e == nil {
+		r.e = fn(r.v)
 	}
 
 	return r
 }
 
 // Else is executed if Result is holding an unexpected error.
-func (r Result[T, E]) Else(fn func(E)) Result[T, E] {
-	if r.e.Ok() {
-		fn(r.e.V())
+func (r Result[T]) Else(fn func(error)) Result[T] {
+	if r.e != nil {
+		fn(r.e)
 	}
 
 	return r

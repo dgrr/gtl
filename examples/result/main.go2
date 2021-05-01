@@ -8,7 +8,7 @@ import (
 	"github.com/dgrr/gtl"
 )
 
-func AddEven(a, b int) (r gtl.Result[int, error]) {
+func AddEven(a, b int) (r gtl.Result[int]) {
 	if a % 2 != 0 || b % 2 != 0 {
 		return r.Err(
 			errors.New("a or b is an odd number"))
@@ -20,7 +20,7 @@ func AddEven(a, b int) (r gtl.Result[int, error]) {
 func main() {
 	s := "19oo"
 
- 	r := gtl.ResultFrom(
+ 	r := gtl.NewResult(
 		strconv.ParseInt(s, 10, 64)).Or(-1)
 	if r.V() == -1 {
 		fmt.Printf("%s conversion failed\n", s)
