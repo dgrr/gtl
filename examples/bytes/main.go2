@@ -9,7 +9,14 @@ import (
 func main() {
 	data := []byte("Hello world\r\n1234")
 
-	b := gtl.BytesFrom(data)
+	b := gtl.Bytes{}
+	fmt.Println("len", b.Len())
+
+	b.Resize(len(data))
+
+	fmt.Println("len after resize", b.Len())
+
+	b.CopyFrom(data)
 
 	fmt.Println(b.Index('0'))
 	fmt.Println(

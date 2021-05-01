@@ -17,6 +17,22 @@ func BytesFrom(bts []byte) Bytes {
 	return Bytes(bts)
 }
 
+// CopyFrom copies the bytes from
+func (b *Bytes) CopyFrom(b2 Bytes) {
+	b.Resize(b2.Len())
+	copy(*b, b2)
+}
+
+// Len returns the length of Bytes.
+func (b Bytes) Len() int {
+	return len(b)
+}
+
+// Cap returns the capacity of Bytes.
+func (b Bytes) Cap() int {
+	return cap(b)
+}
+
 // String returns the `Bytes`' string representation.
 func (b Bytes) String() string {
 	return string(b)
@@ -30,4 +46,22 @@ func (b Bytes) Index(c byte) int {
 // Contains returns whether `b` contains `c` or not.
 func (b Bytes) Contains(c byte) bool {
 	return bytes.IndexByte(b, c) != -1
+}
+
+// Resize ensures that Bytes has at least len = n.
+func (b *Bytes) Resize(n int) {
+	vc := (*Vec[byte])(b)
+	vc.Resize(n)
+}
+
+// Append appends the bytes to the end of Bytes.
+func (b *Bytes) Append(bts ...byte) {
+	vc := (*Vec[byte])(b)
+	vc.Append(bts...)
+}
+
+// Push pushes the `bts` into the first positions of Bytes.
+func (b *Bytes) Push(bts ...byte) {
+	vc := (*Vec[byte])(b)
+	vc.Push(bts...)
 }

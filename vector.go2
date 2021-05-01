@@ -13,6 +13,15 @@ func NewVec[T any](elmnts ...T) Vec[T] {
 	return vc
 }
 
+// Resize ensures `vc` has at least len = n.
+func (vc *Vec[T]) Resize(n int) {
+	if nSize := n - cap(*vc); nSize > 0 {
+		*vc = append((*vc)[:cap(*vc)], make([]T, nSize)...)
+	}
+
+	*vc = (*vc)[:n]
+}
+
 // Append appends `elmnts` to the end of the vector.
 func (vc *Vec[T]) Append(elmnts ...T) {
 	*vc = append(*vc, elmnts...)
