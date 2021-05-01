@@ -13,4 +13,5 @@ func main() {
 
 	fmt.Println(b.Index('\n'))
 	fmt.Println(b.Index('0'))
+	fmt.Println(b.String())
 }

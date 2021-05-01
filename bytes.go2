@@ -17,6 +17,11 @@ func BytesFrom(bts []byte) Bytes {
 	return Bytes(bts)
 }
 
+// String returns the `Bytes`' string representation.
+func (b Bytes) String() string {
+	return string(b)
+}
+
 // Index returns the index of `c`.
 func (b Bytes) Index(c byte) int {
 	return bytes.IndexByte(b, c)
