@@ -1,0 +1,28 @@
+package gtl
+
+import (
+	"bytes"
+)
+
+// Bytes defines a `Vec` of the type byte.
+type Bytes Vec[byte]
+
+// NewBytes creates a new `Bytes` with a len and cap
+func NewBytes(len, cap int) Bytes {
+	return BytesFrom(make([]byte, len, cap))
+}
+
+// BytesFrom creates a `Bytes` from a byte slice.
+func BytesFrom(bts []byte) Bytes {
+	return Bytes(bts)
+}
+
+// Index returns the index of `c`.
+func (b Bytes) Index(c byte) int {
+	return bytes.IndexByte(b, c)
+}
+
+// Contains returns whether `b` contains `c` or not.
+func (b Bytes) Contains(c byte) bool {
+	return bytes.IndexByte(b, c) != -1
+}

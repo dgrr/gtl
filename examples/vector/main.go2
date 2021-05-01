@@ -9,10 +9,10 @@ import (
 )
 
 func main() {
-	var vec gtl.Vector[int]
+	var vec gtl.Vec[int]
 
 	for i := 0; i < 20; i++ {
-		vec.PushBack(
+		vec.Append(
 			rand.Intn(100))
 	}
 
@@ -25,7 +25,7 @@ func main() {
 			vec.PopFront())
 	}
 
-	vec.PushFront(-20)
+	vec.Push(-20)
 
 	fmt.Println("last value", vec.PopFront())
 }

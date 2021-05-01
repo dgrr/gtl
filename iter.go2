@@ -4,6 +4,8 @@ package gtl
 type Iterator[T any] interface {
 	// Next increments the iterator.
 	Next() bool
+	// Advance advances the cursor `n` steps. Returns false if `n` overflows.
+	Advance(n int) bool
 	// V returns the value held in the iterator.
 	V() T
 }
@@ -18,9 +20,10 @@ type Iterator[T any] interface {
 // help the iterator to move forward. For example, a vector might use as T2
 // an integer, to be used as index for accessing the next element.
 type Iter[T, T2 any] struct {
-	v    *T
-	index  T2
-	next func(T2) (*T, T2)
+	v       *T
+	index   T2
+	next    func(T2) (*T, T2)
+	advance func(T2, int) (*T, T2)
 }
 
 // Index returns the index used in the iterator.
@@ -31,6 +34,12 @@ func (it *Iter[T, T2]) Index() T2 {
 // Next advances the iterator pointer.
 func (it *Iter[T, T2]) Next() bool {
 	it.v, it.index = it.next(it.index)
+
+	return it.v != nil
+}
+
+func (it *Iter[T, T2]) Advance(n int) bool {
+	it.v, it.index = it.advance(it.index, n)
 
 	return it.v != nil
 }

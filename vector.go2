@@ -67,20 +67,30 @@ func (vc *Vec[T]) Iter() Iterator[T] {
 func (vc *Vec[T]) iter() *Iter[T, int] {
 	it := &Iter[T, int]{
 		v: nil,
-	}
-	it.next = func(cnt int) (*T, int) {
-		if cnt < vc.Len() {
-			return &(*vc)[cnt], cnt+1
-		}
+		next: func(cnt int) (*T, int) {
+			if cnt < vc.Len() {
+				return &(*vc)[cnt], cnt + 1
+			}
 
-		return nil, cnt+1
+			return nil, cnt + 1
+		},
+		advance: func(cnt, n int) (*T, int) {
+			cnt += n
+			if cnt < vc.Len() {
+				return &(*vc)[cnt], cnt
+			}
+
+			return nil, cnt
+		},
 	}
 
 	return it
 }
 
-// Search ...
-func (vc *Vec[T]) Search(cmpFn func(it Iterator[T]) bool) int {
+// Index returns the index of an element inside the vector.
+// The `cmpFn` lambda is used to perform the comparison. The lambda
+// gets as input an Iterator[T] and should return true if the value matches the expected.
+func (vc *Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
 	i := -1
 	for it := vc.iter(); it.Next(); {
 		if cmpFn(it) {
@@ -90,4 +100,15 @@ func (vc *Vec[T]) Search(cmpFn func(it Iterator[T]) bool) int {
 	}
 
 	return i
+}
+
+// Search is like Search but it returns the Iterator that matched.
+func (vc *Vec[T]) Search(cmpFn func(it Iterator[T]) bool) Iterator[T] {
+	for it := vc.iter(); it.Next(); {
+		if cmpFn(it) {
+			return it
+		}
+	}
+
+	return nil
 }

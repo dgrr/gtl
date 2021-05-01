@@ -1,0 +1,16 @@
+package main
+
+import (
+	"fmt"
+
+	"github.com/dgrr/gtl"
+)
+
+func main() {
+	data := []byte("Hello world\r\n1234")
+
+	b := gtl.BytesFrom(data)
+
+	fmt.Println(b.Index('\n'))
+	fmt.Println(b.Index('0'))
+}
