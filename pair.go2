@@ -6,8 +6,8 @@ type Pair[T, U any] struct {
 	u U
 }
 
-// MakePair returns a Pair[T, U].
-func MakePair[T, U any](t T, u U) Pair[T, U] {
+// NewPair returns a Pair[T, U].
+func NewPair[T, U any](t T, u U) Pair[T, U] {
 	return Pair[T, U]{
 		t: t,
 		u: u,

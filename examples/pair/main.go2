@@ -8,10 +8,10 @@ import (
 
 func main() {
 	prices := gtl.NewVec(
-		gtl.MakePair("BNB", 620.2))
+		gtl.NewPair("BNB", 620.2))
 
-	prices.Append(gtl.MakePair("BTC", 57283.30))
-	prices.Append(gtl.MakePair("ETH", 2874.17))
+	prices.Append(gtl.NewPair("BTC", 57283.30))
+	prices.Append(gtl.NewPair("ETH", 2874.17))
 
 	for _, pricePair := range prices {
 		fmt.Printf("%s: %0.2f\n", pricePair.First(), pricePair.Second())
