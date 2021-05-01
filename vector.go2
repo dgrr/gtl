@@ -1,41 +1,41 @@
 package gtl
 
-// Vector represents a slice of type `T`.
-type Vector[T any] []T
+// Vec represents a slice of type `T`.
+type Vec[T any] []T
 
-// NewVector returns a new Vector.
+// NewVec returns a new Vec.
 //
 // If `elmnts` is defined, the contents will be append.
-func NewVector[T any](elmnts ...T) *Vector[T] {
-	vc := &Vector[T]{}
+func NewVec[T any](elmnts ...T) *Vec[T] {
+	vc := &Vec[T]{}
 	vc.Append(elmnts...)
 
 	return vc
 }
 
 // Append appends `elmnts` to the end of the vector.
-func (vc *Vector[T]) Append(elmnts ...T) {
+func (vc *Vec[T]) Append(elmnts ...T) {
 	*vc = append(*vc, elmnts...)
 }
 
 // Push pushes the `elmnts` into the first positions of the vector.
-func (vc *Vector[T]) Push(elmnts ...T) {
+func (vc *Vec[T]) Push(elmnts ...T) {
 	*vc = append((*vc)[:len(elmnts)], *vc...)
 	copy(*vc, elmnts)
 }
 
 // Front returns a pointer to the first element of the vector.
-func (vc *Vector[T]) Front() *T {
+func (vc *Vec[T]) Front() *T {
 	return &(*vc)[0]
 }
 
 // Back returns a pointer to the last element of the vector.
-func (vc *Vector[T]) Back() *T {
+func (vc *Vec[T]) Back() *T {
 	return &(*vc)[vc.Len()-1]
 }
 
 // PopBack returns the last element and removes it from the vector.
-func (vc *Vector[T]) PopBack() (e T) {
+func (vc *Vec[T]) PopBack() (e T) {
 	if len(*vc) > 0 {
 		e = (*vc)[len(*vc)-1]
 		*vc = (*vc)[:len(*vc)-1]
@@ -45,7 +45,7 @@ func (vc *Vector[T]) PopBack() (e T) {
 }
 
 // PopFront returns the first elements and removes it from the vector.
-func (vc *Vector[T]) PopFront() (e T) {
+func (vc *Vec[T]) PopFront() (e T) {
 	if len(*vc) > 0 {
 		e = (*vc)[0]
 		*vc = append((*vc)[:0], (*vc)[1:]...)
@@ -55,12 +55,12 @@ func (vc *Vector[T]) PopFront() (e T) {
 }
 
 // Len returns the number of elements in `vc`.
-func (vc *Vector[T]) Len() int {
+func (vc *Vec[T]) Len() int {
 	return len(*vc)
 }
 
 // Iter returns an iterator over the vector.
-func (vc *Vector[T]) Iter() Iterator[T] {
+func (vc *Vec[T]) Iter() Iterator[T] {
 	it := &Iter[T, int]{
 		v: nil,
 	}
