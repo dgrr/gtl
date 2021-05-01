@@ -19,8 +19,13 @@ func NewLocker[T any](v T, lck sync.Locker) *Locker[T] {
 	}
 }
 
-// V returns a pointer to `T`.
-func (lck *Locker[T]) V() *T {
+// V returns the value of T.
+func (lck *Locker[T]) V() T {
+	return lck.v
+}
+
+// VPtr returns a pointer to `T`.
+func (lck *Locker[T]) VPtr() *T {
 	return &lck.v
 }
 
