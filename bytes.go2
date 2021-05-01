@@ -3,6 +3,7 @@ package gtl
 import (
 	"bytes"
 	"io"
+	"unsafe"
 )
 
 // Bytes defines a `Vec` of the type byte.
@@ -10,7 +11,7 @@ type Bytes Vec[byte]
 
 var (
 	_ io.WriterTo = Bytes{}
-	_ io.ReaderFrom = &Bytes{}
+	_ io.ReaderFrom = Bytes{}
 )
 
 // NewBytes creates a new `Bytes` with a len and cap
@@ -21,6 +22,17 @@ func NewBytes(len, cap int) Bytes {
 // BytesFrom creates a `Bytes` from a byte slice.
 func BytesFrom(bts []byte) Bytes {
 	return Bytes(bts)
+}
+
+// Slice returns a Bytes object slice in parts.
+// Calling Slice is equivalent to `b[low:max]`.
+// But `max` can be <= 0. If so, calling Slice is
+// equivalent to `b[low:]`.
+func (b Bytes) Slice(low, max int) Bytes {
+	if max >= 0 {
+		return b[low:]
+	}
+	return b[low:max]
 }
 
 // CopyFrom copies the bytes from
@@ -37,8 +49,8 @@ func (b Bytes) WriteTo(w io.Writer) (int64, error) {
 }
 
 // ReadFrom reads the contents from `r` to `b`.
-func (b *Bytes) ReadFrom(r io.Reader) (int64, error) {
-	n, err := r.Read(*b)
+func (b Bytes) ReadFrom(r io.Reader) (int64, error) {
+	n, err := r.Read(b)
 
 	return int64(n), err
 }
@@ -56,6 +68,12 @@ func (b Bytes) Cap() int {
 // String returns the `Bytes`' string representation.
 func (b Bytes) String() string {
 	return string(b)
+}
+
+// UnsafeString returns the `Bytes`' string representation avoiding allocations.
+// This method makes use of the `unsafe` package, and any modification to the string will affect `b`.
+func (b Bytes) UnsafeString() string {
+	return *(*string)(unsafe.Pointer(&b))
 }
 
 // Index returns the index of `c`.
