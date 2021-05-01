@@ -11,7 +11,7 @@ func main() {
 
 	b := gtl.BytesFrom(data)
 
-	fmt.Println(b.Index('\n'))
 	fmt.Println(b.Index('0'))
-	fmt.Println(b.String())
+	fmt.Println(
+		b[:b.Index('\r')].String())
 }
