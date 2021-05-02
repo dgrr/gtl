@@ -11,6 +11,18 @@ func NewOptional[T any](v *T) Optional[T] {
 	}
 }
 
+func OptionalFrom[T any](v T, err error) (opt Optional[T]) {
+	return opt.From(v, err)
+}
+
+func (opt Optional[T]) From(v T, err error) Optional[T] {
+	if err == nil {
+		opt.v = &v
+	}
+
+	return opt
+}
+
 // V returns the held value if it has been defined previously.
 func (opt Optional[T]) V() (v T) {
 	if opt.v != nil {
@@ -20,6 +32,15 @@ func (opt Optional[T]) V() (v T) {
 	return
 }
 
+// Or assigns `v` to `opt` only if the Optional value is not defined.
+func (opt Optional[T]) Or(v T) Optional[T] {
+	if opt.v == nil {
+		opt.v = &v
+	}
+
+	return opt
+}
+
 // Ok returns true if Optional is holding a value.
 func (opt Optional[T]) Ok() bool {
 	return opt.v != nil
@@ -27,11 +48,7 @@ func (opt Optional[T]) Ok() bool {
 
 // Set sets the value to the optional struct.
 func (opt *Optional[T]) Set(v T) {
-	if opt.v == nil {
-		opt.v = new(T)
-	}
-
-	*opt.v = v
+	opt.v = &v
 }
 
 // Drop drops any previously set value.

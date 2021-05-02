@@ -2,26 +2,29 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/dgrr/gtl"
 )
 
-func myFunc(shouldHave bool) (op gtl.Optional[int]) {
-	if shouldHave {
-		op.Set(20)
+func myHandler(n gtl.Optional[int64]) {
+	if n.Ok() {
+		fmt.Println("Handler recv", n.V())
 	}
-	
-	return op
 }
 
 func main() {
-	v := myFunc(true)
-	if v.Ok() {
-		fmt.Println("has value", v.V())
-	} else {
-		v.Set(20)
-	}
+	n := gtl.OptionalFrom(
+		strconv.ParseInt("123", 10, 64))
+	myHandler(n)
 
-	v.Drop()
-	fmt.Println("after drop:", v.Ok(), v.V())
+	n.Drop()
+
+	n = gtl.OptionalFrom(
+		strconv.ParseInt("abc", 10, 64))
+	myHandler(n)
+
+	n = gtl.OptionalFrom(
+		strconv.ParseInt("981a", 10, 64)).Or(0)
+	myHandler(n)
 }
