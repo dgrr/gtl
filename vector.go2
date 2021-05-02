@@ -13,13 +13,18 @@ func NewVec[T any](elmnts ...T) Vec[T] {
 	return vc
 }
 
-// Resize ensures `vc` has at least len = n.
+// Resize increases (if needed) the length of the vector to match `n`.
 func (vc *Vec[T]) Resize(n int) {
+	vc.Reserve(n)
+	*vc = (*vc)[:n]
+}
+
+// Reserve ensures `vc` has at least len = n.
+// It doesn't change the length if the len is less than `n`.
+func (vc *Vec[T]) Reserve(n int) {
 	if nSize := n - cap(*vc); nSize > 0 {
 		*vc = append((*vc)[:cap(*vc)], make([]T, nSize)...)
 	}
-
-	*vc = (*vc)[:n]
 }
 
 // Append appends `elmnts` to the end of the vector.
@@ -92,6 +97,18 @@ func (vc *Vec[T]) Del(it Iterator[T]) bool {
 	return ok && vc.DelIndex(nit.Index())
 }
 
+// DelFn removes all the elements matching the lambda criteria.
+//
+// If cmpFn returns true, the iterator will be removed.
+func (vc *Vec[T]) DelFn(cmpFn func(it Iterator[T]) bool) {
+	for it := vc.iter(); it.Next(); {
+		if cmpFn(it) {
+			vc.DelIndex(it.Index())
+			it.index = it.prev
+		}
+	}
+}
+
 // DelIndex removes the element in the index `i`.
 //
 // Returns true if the element has been removed.
@@ -148,10 +165,23 @@ func (vc Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
 	return i
 }
 
-// Search is like Search but it returns the Iterator that matched.
+// Search iterates over the vector calling `cmpFn`.
+//
+// If cmpFn returns true, Search returns the current Iterator.
 func (vc Vec[T]) Search(cmpFn func(it Iterator[T]) bool) Iterator[T] {
 	for it := vc.iter(); it.Next(); {
 		if cmpFn(it) {
+			return it
+		}
+	}
+
+	return nil
+}
+
+// SearchV is like Search but the input of `cmpFn` is the value, not the iterator.
+func (vc Vec[T]) SearchV(cmpFn func(T) bool) Iterator[T] {
+	for it := vc.iter(); it.Next(); {
+		if cmpFn(it.V()) {
 			return it
 		}
 	}
