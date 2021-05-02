@@ -38,7 +38,7 @@ func (b Bytes) Slice(low, max int) Bytes {
 
 // CopyFrom copies the bytes from
 func (b *Bytes) CopyFrom(b2 Bytes) {
-	b.Resize(b2.Len())
+	b.Reserve(b2.Len())
 	copy(*b, b2)
 }
 
@@ -60,7 +60,7 @@ func (b Bytes) ReadFrom(r io.Reader) (int64, error) {
 //
 // If `n` is greater than `b`'s len, b will be resized.
 func (b *Bytes) LimitReadFrom(r io.Reader, n int) (int64, error) {
-	b.Resize(n)
+	b.Reserve(n)
 	return b.Slice(0, n).ReadFrom(r)
 }
 
@@ -100,10 +100,16 @@ func (b Bytes) Contains(c byte) bool {
 	return bytes.IndexByte(b, c) != -1
 }
 
-// Resize ensures that Bytes has at least len = n.
+// Resize increases (if needed) the length of Bytes to match `n`.
 func (b *Bytes) Resize(n int) {
 	vc := (*Vec[byte])(b)
 	vc.Resize(n)
+}
+
+// Reserve ensures that Bytes has at least len = n.
+func (b *Bytes) Reserve(n int) {
+	vc := (*Vec[byte])(b)
+	vc.Reserve(n)
 }
 
 // Append appends the bytes to the end of Bytes.
