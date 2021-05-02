@@ -50,7 +50,7 @@ into the Result's expected value. In the other hand, `Else` will be executed if 
 
 If we don't want to handle errors but we just want to get the value, we can do the following:
 ```go
-func Do() (r gtl.Result[string, error]) {
+func Do() (r gtl.Result[string]) {
   // assume Do() didn't change
 }
 
