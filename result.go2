@@ -1,5 +1,9 @@
 package gtl
 
+import (
+	"fmt"
+)
+
 // Result represents the result of a function.
 //
 // A result has an expected value, which is T
@@ -61,6 +65,29 @@ func (r Result[T]) Or(v T) Result[T] {
 	}
 
 	return r
+}
+
+// Map passes the holding value to `fn` if no error is being held.
+func (r Result[T]) Map(fn func(T) T) Result[T] {
+	if r.e == nil {
+		r.v = fn(r.v)
+	}
+
+	return r
+}
+
+// Unwrap unwraps the Result returning the value, if any.
+func (r Result[T]) Unwrap() T {
+	return r.v
+}
+
+// Expect returns the holding value. If `r` is holding an error, the function panics
+// with a message of the format: `str: error`.
+func (r Result[T]) Expect(str string) T {
+	if r.e != nil {
+		panic(fmt.Sprintf("%s: %s", str, r.e))
+	}
+	return r.v
 }
 
 // V returns the expected value.

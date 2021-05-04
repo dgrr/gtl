@@ -7,46 +7,51 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"strings"
 
 	"github.com/dgrr/gtl"
 )
 
 func main() {
-	if err := start(); err != nil {
-		log.Fatalln(err)
-	}
+	gtl.NewResult(
+		net.Listen("tcp", ":42421"),
+	).ThenE(serve).Expect("error listening")
 }
 
-func start() error {
-	return gtl.NewResult(
-		net.Listen("tcp", ":42421"),
-	).ThenE(func(ln net.Listener) error {
-		s := Server{
-			ln: ln,
-			conns: gtl.NewLocker[gtl.Vec[net.Conn]](),
-		}
-		go s.handleSignals()
+func serve(ln net.Listener) error {
+	s := Server{
+		ln: ln,
+		conns: gtl.NewLocker[gtl.Vec[net.Conn]](),
+	}
+	go s.handleSignals()
 
-		for {
-			r := gtl.NewResult(
-				ln.Accept(),
-			).Then(func(c net.Conn) {
-				s.conns.Lock()
-				s.conns.Ptr().Append(c)
-				s.conns.Unlock()
-
-				go s.handleConn(c)
-			})
-
-			if !r.IsOk() {
-				return r.E()
+	for {
+		c := gtl.NewResult(
+			ln.Accept(),
+		).ElseE(func(err error) error {
+			if strings.Contains(err.Error(), "use of closed") {
+				err = nil
 			}
+
+			return err
+		}).Expect("error accepting client")
+
+		if c == nil {
+			break
 		}
-	}).E()
+
+		s.conns.Lock()
+		s.conns.Ptr().Append(c)
+		s.conns.Unlock()
+
+		go s.handleConn(c)
+	}
+
+	return nil
 }
 
 type Server struct {
-	ln net.Listener
+	ln    net.Listener
 	conns *gtl.Locker[gtl.Vec[net.Conn]]
 }
 
@@ -75,11 +80,14 @@ func (s *Server) handleConn(c net.Conn) {
 	defer func() {
 		s.conns.Lock()
 
-		it := s.conns.V().Search(func(it gtl.Iterator[net.Conn]) bool {
+		it := s.conns.Ptr().Search(func(it gtl.Iterator[net.Conn]) bool {
 			return it.V() == c
 		})
-		if it != nil && s.conns.Ptr().Del(it) {
-			log.Printf("Removed: %s\n", it.V().RemoteAddr())
+		if it != nil {
+			remoteAddr := it.V().RemoteAddr()
+			if s.conns.Ptr().Del(it) {
+				log.Printf("Removed: %s\n", remoteAddr)
+			}
 		}
 
 		s.conns.Unlock()
@@ -96,6 +104,7 @@ func (s *Server) handleConn(c net.Conn) {
 			return gtl.NewResult(
 				b.LimitWriteTo(c, int(n))).E()
 		})
+
 		if !r.IsOk() {
 			if r.E() != io.EOF {
 				log.Printf("error reading from %s: %s", c.RemoteAddr(), r.E())

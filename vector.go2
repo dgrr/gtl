@@ -135,7 +135,7 @@ func (vc Vec[T]) iter() *Iter[T, int] {
 				return &vc[cnt], cnt + 1
 			}
 
-			return nil, cnt + 1
+			return nil, cnt
 		},
 		advance: func(cnt, n int) (*T, int) {
 			cnt += n
