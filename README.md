@@ -36,12 +36,16 @@ func Do() (r gtl.Result[string]) {
   return r.Ok("Success")
 }
 
+func onSuccess(v string) {
+	fmt.Printf("Got result: %s\n", v)
+}
+
+func onError(err error) {
+	fmt.Printf("Got error: %s\n", err)
+}
+
 func main() {
-  Do().Then(func(v string) {
-    fmt.Printf("Got result: %s\n", v)
-  }).Else(func(err error) {
-    fmt.Printf("Got error: %s\n", err)
-  })
+  Do().Then(onSuccess).Else(onError)
 }
 ```
 
