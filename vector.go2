@@ -13,6 +13,11 @@ func NewVec[T any](elmnts ...T) Vec[T] {
 	return vc
 }
 
+// Get returns the element in the position `i`.
+func (vc Vec[T]) Get(i int) T {
+	return vc[i]
+}
+
 // Resize increases (if needed) the length of the vector to match `n`.
 func (vc *Vec[T]) Resize(n int) {
 	vc.Reserve(n)
