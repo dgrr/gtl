@@ -87,13 +87,18 @@ func main() {
 Iterator tries to emulate a [C++'s iterator](https://en.cppreference.com/w/cpp/iterator/iterator).
 It is defined as follows:
 ```go
+// Iterator defines an interface for iterative objects.
 type Iterator[T any] interface {
+	// Next increments the iterator.
 	Next() bool
-	V()    T
+	// Advance advances the cursor `n` steps. Returns false if `n` overflows.
+	Advance(n int) bool
+	// V returns the value held in the iterator.
+	V() T
+	// Ptr returns a pointer to T.
+	Ptr() *T
 }
 ```
-
-The iterator then has 2 functions, one for incrementing the iterator and another for getting the underlying value.
 
 ## Vector
 
