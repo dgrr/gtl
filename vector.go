@@ -128,9 +128,9 @@ func (vc *Vec[T]) DelIndex(i int) bool {
 }
 
 // Iter returns an iterator over the vector.
-// func (vc Vec[T]) Iter() Iterator[T] {
-// 	return vc.iter()
-// }
+func (vc *Vec[T]) Iter() Iterator[T] {
+	return vc.iter()
+}
 
 func (vc *Vec[T]) iter() *Iter[T, int] {
 	it := &Iter[T, int]{
@@ -158,7 +158,7 @@ func (vc *Vec[T]) iter() *Iter[T, int] {
 // Index returns the index of an element inside the vector.
 // The `cmpFn` lambda is used to perform the comparison. The lambda
 // gets as input an Iterator[T] and should return true if the value matches the expected.
-// func (vc Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
+// func (vc *Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
 // 	i := -1
 // 	for it := vc.iter(); it.Next(); {
 // 		if cmpFn(it) {
