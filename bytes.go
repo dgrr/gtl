@@ -10,13 +10,13 @@ import (
 type Bytes Vec[byte]
 
 var (
-	_ io.WriterTo = Bytes{}
+	_ io.WriterTo   = Bytes{}
 	_ io.ReaderFrom = Bytes{}
 )
 
 // NewBytes creates a new `Bytes` with a len and cap
-func NewBytes(len, cap int) Bytes {
-	return BytesFrom(make([]byte, len, cap))
+func NewBytes(size, capacity int) Bytes {
+	return BytesFrom(make([]byte, size, capacity))
 }
 
 // BytesFrom creates a `Bytes` from a byte slice.

@@ -51,7 +51,7 @@ func (r Result[T]) Any(v T, e error) Result[T] {
 	if e == nil {
 		r.v = v
 	}
-	
+
 	return r
 }
 
@@ -87,6 +87,7 @@ func (r Result[T]) Expect(str string) T {
 	if r.e != nil {
 		panic(fmt.Sprintf("%s: %s", str, r.e))
 	}
+
 	return r.v
 }
 
