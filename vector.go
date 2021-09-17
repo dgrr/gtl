@@ -14,8 +14,8 @@ func NewVec[T any](elmnts ...T) Vec[T] {
 }
 
 // Get returns the element in the position `i`.
-func (vc Vec[T]) Get(i int) T {
-	return vc[i]
+func (vc *Vec[T]) Get(i int) T {
+	return (*vc)[i]
 }
 
 // Resize increases (if needed) the length of the vector to match `n`.
@@ -44,23 +44,23 @@ func (vc *Vec[T]) Push(elmnts ...T) {
 }
 
 // Front returns the first element of the vector.
-func (vc Vec[T]) Front() T {
-	return vc[0]
+func (vc *Vec[T]) Front() T {
+	return (*vc)[0]
 }
 
 // FrontPtr returns a pointer to the first element of the vector.
-func (vc Vec[T]) FrontPtr() *T {
-	return &vc[0]
+func (vc *Vec[T]) FrontPtr() *T {
+	return &(*vc)[0]
 }
 
 // Back returns the last element of the vector.
-func (vc Vec[T]) Back() T {
-	return vc[vc.Len()-1]
+func (vc *Vec[T]) Back() T {
+	return (*vc)[vc.Len()-1]
 }
 
 // BackPtr returns a pointer to the last element of the vector.
-func (vc Vec[T]) BackPtr() *T {
-	return &vc[vc.Len()-1]
+func (vc *Vec[T]) BackPtr() *T {
+	return &(*vc)[vc.Len()-1]
 }
 
 // PopBack returns the last element and removes it from the vector.
@@ -84,13 +84,13 @@ func (vc *Vec[T]) PopFront() (e T) {
 }
 
 // Len returns the number of elements in `vc`.
-func (vc Vec[T]) Len() int {
-	return len(vc)
+func (vc *Vec[T]) Len() int {
+	return len(*vc)
 }
 
 // Cap returns the capacity of the vector.
-func (vc Vec[T]) Cap() int {
-	return cap(vc)
+func (vc *Vec[T]) Cap() int {
+	return cap(*vc)
 }
 
 // Del removes the element in the position of the iterator `it`.
@@ -128,16 +128,16 @@ func (vc *Vec[T]) DelIndex(i int) bool {
 }
 
 // Iter returns an iterator over the vector.
-func (vc Vec[T]) Iter() Iterator[T] {
-	return vc.iter()
-}
+// func (vc Vec[T]) Iter() Iterator[T] {
+// 	return vc.iter()
+// }
 
-func (vc Vec[T]) iter() *Iter[T, int] {
+func (vc *Vec[T]) iter() *Iter[T, int] {
 	it := &Iter[T, int]{
 		v: nil,
 		next: func(cnt int) (*T, int) {
 			if cnt < vc.Len() {
-				return &vc[cnt], cnt + 1
+				return &(*vc)[cnt], cnt + 1
 			}
 
 			return nil, cnt
@@ -145,7 +145,7 @@ func (vc Vec[T]) iter() *Iter[T, int] {
 		advance: func(cnt, n int) (*T, int) {
 			cnt += n
 			if cnt < vc.Len() {
-				return &vc[cnt], cnt
+				return &(*vc)[cnt], cnt
 			}
 
 			return nil, cnt
@@ -158,38 +158,38 @@ func (vc Vec[T]) iter() *Iter[T, int] {
 // Index returns the index of an element inside the vector.
 // The `cmpFn` lambda is used to perform the comparison. The lambda
 // gets as input an Iterator[T] and should return true if the value matches the expected.
-func (vc Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
-	i := -1
-	for it := vc.iter(); it.Next(); {
-		if cmpFn(it) {
-			i = it.Index()
-			break
-		}
-	}
-
-	return i
-}
+// func (vc Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
+// 	i := -1
+// 	for it := vc.iter(); it.Next(); {
+// 		if cmpFn(it) {
+// 			i = it.Index()
+// 			break
+// 		}
+// 	}
+//
+// 	return i
+// }
 
 // Search iterates over the vector calling `cmpFn`.
 //
 // If cmpFn returns true, Search returns the current Iterator.
-func (vc Vec[T]) Search(cmpFn func(it Iterator[T]) bool) Iterator[T] {
-	for it := vc.iter(); it.Next(); {
-		if cmpFn(it) {
-			return it
-		}
-	}
+// func (vc Vec[T]) Search(cmpFn func(it Iterator[T]) bool) Iterator[T] {
+// 	for it := vc.iter(); it.Next(); {
+// 		if cmpFn(it) {
+// 			return it
+// 		}
+// 	}
+//
+// 	return nil
+// }
 
-	return nil
-}
-
-// SearchV is like Search but the input of `cmpFn` is the value, not the iterator.
-func (vc Vec[T]) SearchV(cmpFn func(T) bool) Iterator[T] {
-	for it := vc.iter(); it.Next(); {
-		if cmpFn(it.V()) {
-			return it
-		}
-	}
-
-	return nil
-}
+// // SearchV is like Search but the input of `cmpFn` is the value, not the iterator.
+// func (vc Vec[T]) SearchV(cmpFn func(T) bool) Iterator[T] {
+// 	for it := vc.iter(); it.Next(); {
+// 		if cmpFn(it.V()) {
+// 			return it
+// 		}
+// 	}
+//
+// 	return nil
+// }
