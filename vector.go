@@ -17,14 +17,6 @@ func NewVecSize[T any](size, capacity int) Vec[T] {
 	return (Vec[T])(make([]T, size, capacity))
 }
 
-func (vc *Vec[T]) Len() int {
-	return len(*vc)
-}
-
-func (vc *Vec[T]) Cap() int {
-	return cap(*vc)
-}
-
 // Get returns the element in the position `i`.
 func (vc *Vec[T]) Get(i int) T {
 	return (*vc)[i]
