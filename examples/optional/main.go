@@ -4,27 +4,27 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/dgrr/gtl"
+	. "github.com/dgrr/gtl"
 )
 
-func myHandler(n gtl.Optional[int64]) {
-	if n.Ok() {
+func myHandler(n Optional[int64]) {
+	if n.IsOk() {
 		fmt.Println("Handler recv", n.V())
 	}
 }
 
 func main() {
-	n := gtl.OptionalFrom(
+	n := OptionalFrom(
 		strconv.ParseInt("123", 10, 64))
 	myHandler(n)
 
 	n.Drop()
 
-	n = gtl.OptionalFrom(
+	n = OptionalFrom(
 		strconv.ParseInt("abc", 10, 64))
 	myHandler(n)
 
-	n = gtl.OptionalFrom(
+	n = OptionalFrom(
 		strconv.ParseInt("981a", 10, 64)).Or(0)
 	myHandler(n)
 }

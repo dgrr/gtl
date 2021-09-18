@@ -38,6 +38,7 @@ func main() {
 	prices := getPrices()
 
 	for _, pricePair := range prices {
+		// TODO: this print panics bc the compiler fails to assert something
 		fmt.Printf("%s: %0.2f\n", pricePair.First(), pricePair.Second().Or(0).Unwrap())
 	}
 }

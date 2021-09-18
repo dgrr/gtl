@@ -13,18 +13,6 @@ func NewVec[T any](elmnts ...T) Vec[T] {
 	return vc
 }
 
-func NewVecSize[T any](size, capacity int) Vec[T] {
-	return (Vec[T])(make([]T, size, capacity))
-}
-
-func (vc *Vec[T]) Len() int {
-	return len(*vc)
-}
-
-func (vc *Vec[T]) Cap() int {
-	return cap(*vc)
-}
-
 // Get returns the element in the position `i`.
 func (vc *Vec[T]) Get(i int) T {
 	return (*vc)[i]
@@ -105,6 +93,27 @@ func (vc *Vec[T]) Cap() int {
 	return cap(*vc)
 }
 
+// Del removes the element in the position of the iterator `it`.
+//
+// Returns true if the element has been removed.
+func (vc *Vec[T]) Del(it Iterator[T]) bool {
+	nit, ok := it.(*Iter[T, int])
+
+	return ok && vc.DelIndex(nit.Index())
+}
+
+// DelFn removes all the elements matching the lambda criteria.
+//
+// If cmpFn returns true, the iterator will be removed.
+func (vc *Vec[T]) DelFn(cmpFn func(it Iterator[T]) bool) {
+	for it := vc.iter(); it.Next(); {
+		if cmpFn(it) {
+			vc.DelIndex(it.Index())
+			it.index = it.prev
+		}
+	}
+}
+
 // DelIndex removes the element in the index `i`.
 //
 // Returns true if the element has been removed.
@@ -118,22 +127,69 @@ func (vc *Vec[T]) DelIndex(i int) bool {
 	return true
 }
 
-func (vc *Vec[T]) DelFn(fn func(T) bool) (n int) {
-	for i := 0; i < len(*vc); i++ {
-		if fn((*vc)[i]) && vc.DelIndex(i) {
-			n++
-			i--
+// Iter returns an iterator over the vector.
+func (vc *Vec[T]) Iter() Iterator[T] {
+	return vc.iter()
+}
+
+func (vc *Vec[T]) iter() *Iter[T, int] {
+	it := &Iter[T, int]{
+		v: nil,
+		next: func(cnt int) (*T, int) {
+			if cnt < vc.Len() {
+				return &(*vc)[cnt], cnt + 1
+			}
+
+			return nil, cnt
+		},
+		advance: func(cnt, n int) (*T, int) {
+			cnt += n
+			if cnt < vc.Len() {
+				return &(*vc)[cnt], cnt
+			}
+
+			return nil, cnt
+		},
+	}
+
+	return it
+}
+
+// Index returns the index of an element inside the vector.
+// The `cmpFn` lambda is used to perform the comparison. The lambda
+// gets as input an Iterator[T] and should return true if the value matches the expected.
+func (vc *Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
+	i := -1
+	for it := vc.iter(); it.Next(); {
+		if cmpFn(it) {
+			i = it.Index()
+			break
 		}
 	}
 
-	return n
+	return i
 }
 
-// Slice returns a slice from [start, end) of type T.
-func (vc *Vec[T]) Slice(start, end int) []T {
-	if end < start {
-		end = start
+// Search iterates over the vector calling `cmpFn`.
+//
+// If cmpFn returns true, Search returns the current Iterator.
+func (vc Vec[T]) Search(cmpFn func(v T) bool) Iterator[T] {
+	for it := vc.iter(); it.Next(); {
+		if cmpFn(it.V()) {
+			return it
+		}
 	}
 
-	return (*vc)[start:end]
+	return nil
+}
+
+// SearchV is like Search but the input of `cmpFn` is the value, not the iterator.
+func (vc Vec[T]) SearchV(cmpFn func(T) bool) Iterator[T] {
+	for it := vc.iter(); it.Next(); {
+		if cmpFn(it.V()) {
+			return it
+		}
+	}
+
+	return nil
 }

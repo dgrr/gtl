@@ -15,7 +15,6 @@ func Contains[T Comparable](vs []T, e T) bool {
 	return false
 }
 
-// Extract ...
 func Extract[T, E any](set []T, fn func(T) E) []E {
 	r := make([]E, len(set))
 	for i := range set {

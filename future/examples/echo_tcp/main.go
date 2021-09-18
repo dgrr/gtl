@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"os"
@@ -15,14 +14,14 @@ import (
 func main() {
 	gtl.NewResult(
 		net.Listen("tcp", ":42421"),
-	).ThenE(serve).Expect("error listening")
+	).Expect("error listening")
 }
 
 func serve(ln net.Listener) error {
 	s := Server{
 		ln: ln,
-		conns: gtl.NewLocker[gtl.Vec[net.Conn]](),
 	}
+
 	go s.handleSignals()
 
 	for {
@@ -40,9 +39,8 @@ func serve(ln net.Listener) error {
 			break
 		}
 
-		s.conns.Lock()
-		s.conns.Ptr().Append(c)
-		s.conns.Unlock()
+		// TODO: obvious race condition here
+		s.conns.Append(c)
 
 		go s.handleConn(c)
 	}
@@ -52,7 +50,7 @@ func serve(ln net.Listener) error {
 
 type Server struct {
 	ln    net.Listener
-	conns *gtl.Locker[gtl.Vec[net.Conn]]
+	conns gtl.Vec[net.Conn]
 }
 
 func (s *Server) handleSignals() {
@@ -67,7 +65,7 @@ func (s *Server) handleSignals() {
 	signal.Stop(sch)
 	close(sch)
 
-	for it := s.conns.V().Iter(); it.Next(); {
+	for it := s.conns.Iter(); it.Next(); {
 		it.V().Close()
 	}
 
@@ -78,37 +76,29 @@ func (s *Server) handleConn(c net.Conn) {
 	b := gtl.NewBytes(128, 128)
 
 	defer func() {
-		s.conns.Lock()
-
-		it := s.conns.Ptr().Search(func(it gtl.Iterator[net.Conn]) bool {
-			return it.V() == c
+		it := s.conns.Search(func(nc net.Conn) bool {
+			return nc == c
 		})
 		if it != nil {
 			remoteAddr := it.V().RemoteAddr()
-			if s.conns.Ptr().Del(it) {
+			if s.conns.Del(it) {
 				log.Printf("Removed: %s\n", remoteAddr)
 			}
 		}
-
-		s.conns.Unlock()
 	}()
 
 	for {
-		r := gtl.NewResult(
-			b.ReadFrom(c),
-		).ThenE(func(n int64) error {
-			i := b.Index('\n')
+		n, err := b.ReadFrom(c)
+		if err != nil {
+			break
+		}
 
-			fmt.Printf("Recv: %s\n", b.Slice(0, i))
+		i := b.Index('\n')
 
-			return gtl.NewResult(
-				b.LimitWriteTo(c, int(n))).E()
-		})
+		fmt.Printf("Recv: %s\n", b.Slice(0, i))
 
-		if !r.IsOk() {
-			if r.E() != io.EOF {
-				log.Printf("error reading from %s: %s", c.RemoteAddr(), r.E())
-			}
+		_, err = b.LimitWriteTo(c, int(n))
+		if err != nil {
 			break
 		}
 	}

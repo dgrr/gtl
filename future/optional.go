@@ -9,9 +9,9 @@ type Optional[T any] struct {
 //
 // If `v` is nil, Optional will be invalid.
 func NewOptional[T any](v *T) Optional[T] {
-	opt := Optional[T]{}
-	opt.Set(*v)
-	return opt
+	return Optional[T]{
+		v: v,
+	}
 }
 
 // OptionalFrom ...

@@ -1,7 +1,7 @@
 package gtl
 
 type element[T any] struct {
-	v T
+	v    T
 	next *element[T]
 }
 
@@ -13,7 +13,7 @@ type List[T any] struct {
 // Add adds v to the front of the linked list.
 func (lst *List[T]) Add(v T) {
 	e := element[T]{
-		v: v,
+		v:    v,
 		next: lst.next,
 	}
 	lst.next = &e

@@ -105,3 +105,45 @@ func (r Result[T]) E() error {
 func (r Result[T]) VE() (T, error) {
 	return r.V(), r.E()
 }
+
+// Then is executed if Result is not holding an unexpected error.
+func (r Result[T]) Then(fn func(T)) Result[T] {
+	if r.e == nil {
+		fn(r.v)
+	}
+
+	return r
+}
+
+// ThenE is executed if Result is not holding an unexpected error.
+//
+// The function must return en error. The error can be nil.
+// The returned error will be set to the Result's error.
+func (r Result[T]) ThenE(fn func(T) error) Result[T] {
+	if r.e == nil {
+		r.e = fn(r.v)
+	}
+
+	return r
+}
+
+// Else is executed if Result is holding an error.
+func (r Result[T]) Else(fn func(error)) Result[T] {
+	if r.e != nil {
+		fn(r.e)
+	}
+
+	return r
+}
+
+// ElseE is executed if Result is holding an error.
+//
+// The function must return an error. The error can be nil.
+// The returned error will be set to the Result's error.
+func (r Result[T]) ElseE(fn func(error) error) Result[T] {
+	if r.e != nil {
+		r.e = fn(r.e)
+	}
+
+	return r
+}
