@@ -21,8 +21,8 @@ func ExtractFrom[T, E any](set []T, fn func(T) E) []E {
 	return r
 }
 
-// GetIf iterates over `set` and gets the values that match `criteria`.
-func GetIf[T any](set []T, criteria func(T) bool) []T {
+// Filter iterates over `set` and gets the values that match `criteria`.
+func Filter[T any](set []T, criteria func(T) bool) []T {
 	r := make([]T, 0)
 	for i := range set {
 		if criteria(set[i]) {
