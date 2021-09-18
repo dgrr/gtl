@@ -1,4 +1,4 @@
-# GTL: Golang Template Library
+# GTL: Golang Template Library (WIP)
 
 GTL is a template library written in pure Go(2).
 It is intended to hold common data structures that might be missing in the standard library
@@ -138,25 +138,6 @@ func main() {
 Bytes is a helper for working with byte slices.
 
 You can see an example of how to use Bytes [here](https://github.com/dgrr/gtl/blob/2642e2ac98bd8a8fbfbc3e9789d4b87bf6e6e317/examples/echo_tcp/main.go2#L73).
-
-## Locker
-
-A Locker defines a helper structure to facilitate Lock and Unlock wrappers.
-
-```go
-func main() {
-	lck := NewLocker[int]()
-	lck.Set(20)
-	
-	fmt.Println(lck.V())
-	
-	lck.Lock()
-	*lck.Ptr() += 20
-	lck.Unlock()
-	
-	fmt.Println(lck.V())
-}
-```
 
 ### Numeric
 
