@@ -13,6 +13,11 @@ func NewVec[T any](elmnts ...T) Vec[T] {
 	return vc
 }
 
+// NewVecSize creates a vector of type T with the given size and capacity.
+func NewVecSize[T any](size, capacity int) Vec[T] {
+	return (Vec[T])(make([]T, size, capacity))
+}
+
 // Get returns the element in the position `i`.
 func (vc *Vec[T]) Get(i int) T {
 	return (*vc)[i]
@@ -96,10 +101,13 @@ func (vc *Vec[T]) Cap() int {
 // Del removes the element in the position of the iterator `it`.
 //
 // Returns true if the element has been removed.
-func (vc *Vec[T]) Del(it Iterator[T]) bool {
+func (vc *Vec[T]) Del(it Iterator[T]) (val T, erased bool) {
 	nit, ok := it.(*Iter[T, int])
+	if ok {
+		return vc.DelIndex(nit.Index())
+	}
 
-	return ok && vc.DelIndex(nit.Index())
+	return
 }
 
 // DelFn removes all the elements matching the lambda criteria.
@@ -117,14 +125,15 @@ func (vc *Vec[T]) DelFn(cmpFn func(it Iterator[T]) bool) {
 // DelIndex removes the element in the index `i`.
 //
 // Returns true if the element has been removed.
-func (vc *Vec[T]) DelIndex(i int) bool {
+func (vc *Vec[T]) DelIndex(i int) (val T, erased bool) {
 	if vc.Len() <= i {
-		return false
+		return val, false
 	}
 
+	val = (*vc)[i]
 	*vc = append((*vc)[:i], (*vc)[i+1:]...)
 
-	return true
+	return val, true
 }
 
 // Iter returns an iterator over the vector.

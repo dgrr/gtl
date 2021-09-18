@@ -1,11 +1,11 @@
 package main
 
 import (
-	"sort"
 	"fmt"
 	"math/rand"
+	"sort"
 
-	"github.com/dgrr/gtl"
+	"github.com/dgrr/gtl/future"
 )
 
 func main() {
@@ -24,6 +24,15 @@ func main() {
 	sort.Slice(vec, func(i, j int) bool {
 		return vec[i] < vec[j]
 	})
+
+	it := vec.Iter()
+	for i := 0; i < 6; i++ {
+		it.Next()
+	}
+
+	if e, ok := vec.Del(it); ok {
+		fmt.Println("erased", e)
+	}
 
 	for vec.Len() != 0 {
 		fmt.Println(

@@ -5,18 +5,28 @@ type Optional[T any] struct {
 	v *T
 }
 
-// NewOptional returns a new Optional value.
+// NewOpt returns a new Optional value.
 //
 // If `v` is nil, Optional will be invalid.
-func NewOptional[T any](v *T) Optional[T] {
-	opt := Optional[T]{}
-	opt.Set(*v)
+func NewOpt[T any](v *T) (opt Optional[T]) {
+	if v != nil {
+		opt.Set(*v)
+	}
+
 	return opt
 }
 
-// OptionalFrom ...
-func OptionalFrom[T any](v T, err error) (opt Optional[T]) {
+// OptFrom ...
+func OptFrom[T any](v T, err error) (opt Optional[T]) {
 	return opt.From(v, err)
+}
+
+func OptFromBool[T any](v T, cond bool) (opt Optional[T]) {
+	if cond {
+		opt.Set(v)
+	}
+
+	return
 }
 
 // From ...
