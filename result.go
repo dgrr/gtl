@@ -101,7 +101,7 @@ func (r Result[T]) E() error {
 	return r.e
 }
 
-// VE returns V and E.
+// VE returns the value and the error.
 func (r Result[T]) VE() (T, error) {
 	return r.V(), r.E()
 }

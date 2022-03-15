@@ -6,8 +6,8 @@ type Iterator[T any] interface {
 	Next() bool
 	// Advance advances the cursor `n` steps. Returns false if `n` overflows.
 	Advance(n int) bool
-	// V returns the value held in the iterator.
-	V() T
+	// Get returns the value held in the iterator.
+	Get() T
 	// Ptr returns a pointer to T.
 	Ptr() *T
 }
@@ -48,8 +48,8 @@ func (it *Iter[T, T2]) Advance(n int) bool {
 	return it.v != nil
 }
 
-// V returns the value held in the iterator.
-func (it *Iter[T, T2]) V() T {
+// Get returns the value held in the iterator.
+func (it *Iter[T, T2]) Get() T {
 	return *it.v
 }
 

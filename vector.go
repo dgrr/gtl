@@ -104,7 +104,7 @@ func (vc *Vec[T]) Cap() int {
 func (vc *Vec[T]) Del(it Iterator[T]) (val T, erased bool) {
 	nit, ok := it.(*Iter[T, int])
 	if ok {
-		return vc.DelIndex(nit.Index())
+		return vc.DelByIndex(nit.Index())
 	}
 
 	return
@@ -116,16 +116,16 @@ func (vc *Vec[T]) Del(it Iterator[T]) (val T, erased bool) {
 func (vc *Vec[T]) Filter(cmpFn func(it Iterator[T]) bool) {
 	for it := vc.iter(); it.Next(); {
 		if !cmpFn(it) {
-			vc.DelIndex(it.Index())
+			vc.DelByIndex(it.Index())
 			it.index = it.prev
 		}
 	}
 }
 
-// DelIndex removes the element in the index `i`.
+// DelByIndex removes the element in the index `i`.
 //
 // Returns true if the element has been removed.
-func (vc *Vec[T]) DelIndex(i int) (val T, erased bool) {
+func (vc *Vec[T]) DelByIndex(i int) (val T, erased bool) {
 	if vc.Len() <= i {
 		return val, false
 	}
@@ -184,7 +184,7 @@ func (vc *Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
 // If cmpFn returns true, Search returns the current Iterator.
 func (vc Vec[T]) Search(cmpFn func(v T) bool) Iterator[T] {
 	for it := vc.iter(); it.Next(); {
-		if cmpFn(it.V()) {
+		if cmpFn(it.Get()) {
 			return it
 		}
 	}
@@ -192,10 +192,10 @@ func (vc Vec[T]) Search(cmpFn func(v T) bool) Iterator[T] {
 	return nil
 }
 
-// SearchV is like Search but the input of `cmpFn` is the value, not the iterator.
-func (vc Vec[T]) SearchV(cmpFn func(T) bool) Iterator[T] {
+// SearchByValue is like Search but the input of `cmpFn` is the value, not the iterator.
+func (vc Vec[T]) SearchByValue(cmpFn func(T) bool) Iterator[T] {
 	for it := vc.iter(); it.Next(); {
-		if cmpFn(it.V()) {
+		if cmpFn(it.Get()) {
 			return it
 		}
 	}

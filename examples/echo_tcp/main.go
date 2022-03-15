@@ -66,7 +66,7 @@ func (s *Server) handleSignals() {
 	close(sch)
 
 	for it := s.conns.Iter(); it.Next(); {
-		it.V().Close()
+		it.Get().Close()
 	}
 
 	s.ln.Close()
@@ -80,7 +80,7 @@ func (s *Server) handleConn(c net.Conn) {
 			return nc == c
 		})
 		if it != nil {
-			remoteAddr := it.V().RemoteAddr()
+			remoteAddr := it.Get().RemoteAddr()
 			if _, ok := s.conns.Del(it); ok {
 				log.Printf("Removed: %s\n", remoteAddr)
 			}

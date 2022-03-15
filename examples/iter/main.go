@@ -24,6 +24,6 @@ func main() {
 
 func printAll(it gtl.Iterator[int]) {
 	for it.Next() {
-		fmt.Println(it.V())
+		fmt.Println(it.Get())
 	}
 }

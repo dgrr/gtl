@@ -18,7 +18,7 @@ func main() {
 	}
 
 	vec.Filter(func(it gtl.Iterator[int]) bool {
-		return it.V() != 128
+		return it.Get() != 128
 	})
 
 	sort.Slice(vec, func(i, j int) bool {

@@ -9,7 +9,7 @@ import (
 
 func myHandler(n Optional[int64]) {
 	if n.IsOk() {
-		fmt.Println("Handler recv", n.V())
+		fmt.Println("Handler recv", n.Get())
 	}
 }
 
