@@ -12,8 +12,8 @@ You can learn more about Golang's generics [here](https://go.googlesource.com/pr
 3. [Iterator](#iterator)
 4. [Vector](#vector)
 5. [Bytes](#bytes)
-6. [Locker](#locker)
-7. [Numeric](#numeric)
+6. [Numeric](#numeric)
+7. [Pair](#pair)
 
 ## Result
 
@@ -97,8 +97,8 @@ type Iterator[T any] interface {
 	Next() bool
 	// Advance advances the cursor `n` steps. Returns false if `n` overflows.
 	Advance(n int) bool
-	// V returns the value held in the iterator.
-	V() T
+	// Get returns the value held in the iterator.
+	Get() T
 	// Ptr returns a pointer to T.
 	Ptr() *T
 }
@@ -144,3 +144,10 @@ You can see an example of how to use Bytes [here](https://github.com/dgrr/gtl/bl
 
 There are global numeric helper functions like [Max](https://github.com/dgrr/gtl/blob/b5b6ba36de904e757d00f78351c577a6ad0547e1/numeric.go2#L9)
 and [Min](https://github.com/dgrr/gtl/blob/b5b6ba36de904e757d00f78351c577a6ad0547e1/numeric.go2#L19).
+
+### Pair
+
+Pair is a data structure that holds 2 values [T, U].
+```
+pair := gtl.MakePair("hello", 1234)
+```
