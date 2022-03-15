@@ -6,8 +6,8 @@ type Pair[T, U any] struct {
 	u U
 }
 
-// NewPair returns a Pair[T, U].
-func NewPair[T, U any](t T, u U) Pair[T, U] {
+// MakePair returns a Pair[T, U].
+func MakePair[T, U any](t T, u U) Pair[T, U] {
 	return Pair[T, U]{
 		t: t,
 		u: u,
@@ -16,7 +16,7 @@ func NewPair[T, U any](t T, u U) Pair[T, U] {
 
 // Swap returns a Pair swapping both values.
 func (p Pair[T, U]) Swap() Pair[U, T] {
-	return NewPair(p.u, p.t)
+	return MakePair(p.u, p.t)
 }
 
 // First returns the first element from the Pair.
