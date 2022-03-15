@@ -135,7 +135,8 @@ func main() {
 
 ## Bytes
 
-Bytes is a helper for working with byte slices.
+Bytes is a helper for working with byte slices. It can be used as
+a normal slice for reading data from a net.Conn.
 
 You can see an example of how to use Bytes [here](https://github.com/dgrr/gtl/blob/2642e2ac98bd8a8fbfbc3e9789d4b87bf6e6e317/examples/echo_tcp/main.go2#L73).
 

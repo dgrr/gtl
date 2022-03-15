@@ -81,7 +81,7 @@ func (s *Server) handleConn(c net.Conn) {
 		})
 		if it != nil {
 			remoteAddr := it.V().RemoteAddr()
-			if s.conns.Del(it) {
+			if _, ok := s.conns.Del(it); ok {
 				log.Printf("Removed: %s\n", remoteAddr)
 			}
 		}
