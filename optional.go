@@ -70,7 +70,7 @@ func (opt *Optional[T]) Set(v T) {
 	opt.hasValue = true
 }
 
-// Drop drops any previously set value.
-func (opt *Optional[T]) Drop() {
+// Reset resets the value of the optional.
+func (opt *Optional[T]) Reset() {
 	opt.hasValue = false
 }
