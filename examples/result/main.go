@@ -30,6 +30,10 @@ func main() {
 		fmt.Printf("error: %s\n", r.E())
 	}
 
+	AddIfEven(4, 2).Then(func(res int) {
+		fmt.Println("Res:", res)
+	})
+
 	fmt.Println(
 		"adding odd numbers", AddIfEven(1, 2).Or(-1).V())
 }

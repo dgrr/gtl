@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/dgrr/gtl/future"
+	"github.com/dgrr/gtl"
 )
 
 var contents = []string{
@@ -23,7 +23,7 @@ var prices = map[string]float64{
 func getPrices() (vec gtl.Vec[gtl.Pair[string, gtl.Optional[float64]]]) {
 	for k, v := range prices {
 		vec.Append(
-			gtl.NewPair(k, gtl.OptFromBool(v, v != 0)))
+			gtl.NewPair(k, gtl.OptionalFromBool(v, v != 0)))
 	}
 
 	return

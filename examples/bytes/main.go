@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/dgrr/gtl/future"
+	"github.com/dgrr/gtl"
 )
 
 func main() {

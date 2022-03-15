@@ -5,11 +5,11 @@ import (
 	"math/rand"
 	"sort"
 
-	. "github.com/dgrr/gtl"
+	"github.com/dgrr/gtl"
 )
 
 func main() {
-	var vec Vec[int]
+	var vec gtl.Vec[int]
 
 	for i := 0; i < 20; i++ {
 		vec.Append(128)
@@ -17,13 +17,22 @@ func main() {
 			rand.Intn(100))
 	}
 
-	vec.DelFn(func(v int) bool {
-		return v == 128
+	vec.Filter(func(it gtl.Iterator[int]) bool {
+		return it.V() != 128
 	})
 
 	sort.Slice(vec, func(i, j int) bool {
 		return vec[i] < vec[j]
 	})
+
+	it := vec.Iter()
+	for i := 0; i < 6; i++ {
+		it.Next()
+	}
+
+	if e, ok := vec.Del(it); ok {
+		fmt.Println("erased", e)
+	}
 
 	for vec.Len() != 0 {
 		fmt.Println(

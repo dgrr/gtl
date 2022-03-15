@@ -1,21 +1,20 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"os/signal"
+	"strings"
 
 	"github.com/dgrr/gtl"
 )
 
 func main() {
-	ln := gtl.NewResult(
+	gtl.NewResult(
 		net.Listen("tcp", ":42421"),
 	).Expect("error listening")
-
-	serve(ln)
 }
 
 func serve(ln net.Listener) error {
@@ -28,7 +27,17 @@ func serve(ln net.Listener) error {
 	for {
 		c := gtl.NewResult(
 			ln.Accept(),
-		).Expect("error accepting client")
+		).ElseE(func(err error) error {
+			if strings.Contains(err.Error(), "use of closed") {
+				err = nil
+			}
+
+			return err
+		}).Expect("error accepting client")
+
+		if c == nil {
+			break
+		}
 
 		// TODO: obvious race condition here
 		s.conns.Append(c)
@@ -56,27 +65,39 @@ func (s *Server) handleSignals() {
 	signal.Stop(sch)
 	close(sch)
 
-	for _, c := range s.conns {
-		c.Close()
+	for it := s.conns.Iter(); it.Next(); {
+		it.V().Close()
 	}
 
 	s.ln.Close()
 }
 
 func (s *Server) handleConn(c net.Conn) {
-	b := gtl.NewVecSize[byte](128, 128)
+	b := gtl.NewBytes(128, 128)
+
+	defer func() {
+		it := s.conns.Search(func(nc net.Conn) bool {
+			return nc == c
+		})
+		if it != nil {
+			remoteAddr := it.V().RemoteAddr()
+			if s.conns.Del(it) {
+				log.Printf("Removed: %s\n", remoteAddr)
+			}
+		}
+	}()
 
 	for {
-		n, err := c.Read(b)
+		n, err := b.ReadFrom(c)
 		if err != nil {
 			break
 		}
 
-		i := bytes.IndexByte(b, '\n')
+		i := b.Index('\n')
 
 		fmt.Printf("Recv: %s\n", b.Slice(0, i))
 
-		_, err = c.Write(b[:n])
+		_, err = b.LimitWriteTo(c, int(n))
 		if err != nil {
 			break
 		}
