@@ -196,8 +196,8 @@ func TestTreeTravel(t *testing.T) {
 			t.Fatalf("unexpected element. Expected %s got %s", order[idx], n.Name())
 		}
 
-		if n.Data() != datas[idx] {
-			t.Fatalf("unexpected data. Expected %d got %d", datas[idx], n.Data())
+		if n.Data().Get() != datas[idx] {
+			t.Fatalf("unexpected data. Expected %d got %d", datas[idx], n.Data().Get())
 		}
 
 		path := n.Path()
@@ -223,8 +223,8 @@ func TestTreeTravel(t *testing.T) {
 			t.Fatalf("unexpected element. Expected %s got %s", order[idx], n.Name())
 		}
 
-		if n.Data() != datas[idx] {
-			t.Fatalf("unexpected data. Expected %d got %d", datas[idx], n.Data())
+		if n.Data().Get() != datas[idx] {
+			t.Fatalf("unexpected data. Expected %d got %d", datas[idx], n.Data().Get())
 		}
 
 		idx++

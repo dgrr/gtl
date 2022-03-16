@@ -1,7 +1,7 @@
 package gtl
 
 type Tree[Key comparable, Value any] struct {
-	data Value
+	data Optional[Value]
 
 	name Key
 	path []Key
@@ -23,7 +23,7 @@ func (tree *Tree[Key, Value]) Path() []Key {
 	return tree.path
 }
 
-func (tree *Tree[Key, Value]) Data() Value {
+func (tree *Tree[Key, Value]) Data() Optional[Value] {
 	return tree.data
 }
 
@@ -49,7 +49,7 @@ func (tree *Tree[Key, Value]) Get(path ...Key) (depth int, opt Optional[Value]) 
 	lastTree := tree.getLastTree(path...)
 	if lastTree != nil {
 		depth = lastTree.depth
-		opt.Set(lastTree.data)
+		opt = lastTree.data
 	}
 
 	return
@@ -61,7 +61,7 @@ func (tree *Tree[Key, Value]) Fetch(path ...Key) (opt Optional[Value]) {
 	if lastTree != nil {
 		// len - 1 because the depth starts on 0
 		if lastTree.depth == len(path)-1 {
-			opt.Set(lastTree.data)
+			opt = lastTree.data
 		}
 	}
 
@@ -167,7 +167,7 @@ func (tree *Tree[Key, Value]) Set(data Value, path ...Key) {
 
 func (tree *Tree[Key, Value]) set(data Value, depth int, cumPath []Key, path ...Key) {
 	if len(path) == 0 {
-		tree.data = data
+		tree.data.Set(data)
 		return
 	}
 
