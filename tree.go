@@ -1,34 +1,34 @@
 package gtl
 
-type Tree[T any] struct {
-	data T
+type Tree[Key comparable, Value any] struct {
+	data Value
 
-	name string
-	path []string
+	name Key
+	path []Key
 
 	depth int
 
-	nodes []*Tree[T]
+	nodes []*Tree[Key, Value]
 }
 
-func (tree *Tree[T]) Trees() []*Tree[T] {
+func (tree *Tree[Key, Value]) Trees() []*Tree[Key, Value] {
 	return tree.nodes
 }
 
-func (tree *Tree[T]) Name() string {
+func (tree *Tree[Key, Value]) Name() Key {
 	return tree.name
 }
 
-func (tree *Tree[T]) Path() []string {
+func (tree *Tree[Key, Value]) Path() []Key {
 	return tree.path
 }
 
-func (tree *Tree[T]) Data() T {
+func (tree *Tree[Key, Value]) Data() Value {
 	return tree.data
 }
 
 // Depth returns the absolute depth of the node in the tree.
-func (tree *Tree[T]) Depth() int {
+func (tree *Tree[Key, Value]) Depth() int {
 	return tree.depth
 }
 
@@ -43,7 +43,7 @@ func (tree *Tree[T]) Depth() int {
 // As `c` doesn't exist, Get will return depth = 1 and data = 2.
 //
 // To get the exact data from the path use Fetch.
-func (tree *Tree[T]) Get(path ...string) (depth int, opt Optional[T]) {
+func (tree *Tree[Key, Value]) Get(path ...Key) (depth int, opt Optional[Value]) {
 	depth = -1
 
 	lastTree := tree.getLastTree(path...)
@@ -56,7 +56,7 @@ func (tree *Tree[T]) Get(path ...string) (depth int, opt Optional[T]) {
 }
 
 // Fetch returns the data from the exact path. If the path doesn't exist nil will be returned.
-func (tree *Tree[T]) Fetch(path ...string) (opt Optional[T]) {
+func (tree *Tree[Key, Value]) Fetch(path ...Key) (opt Optional[Value]) {
 	lastTree := tree.getLastTree(path...)
 	if lastTree != nil {
 		// len - 1 because the depth starts on 0
@@ -71,23 +71,23 @@ func (tree *Tree[T]) Fetch(path ...string) (opt Optional[T]) {
 // GetTree gets the latest node from the path.
 //
 // It works like Get but fetching the Tree instead of the depth and data.
-func (tree *Tree[T]) GetTree(path ...string) *Tree[T] {
+func (tree *Tree[Key, Value]) GetTree(path ...Key) *Tree[Key, Value] {
 	return tree.getLastTree(path...)
 }
 
 // Range will travel the tree using a Depth-first search algo.
-func (tree *Tree[T]) Range(fn func(*Tree[T]) bool, path ...string) {
+func (tree *Tree[Key, Value]) Range(fn func(*Tree[Key, Value]) bool, path ...Key) {
 	tree.rangeOver(fn, -1, path...)
 }
 
 // RangeAll will travel all the nodes from the tree using a Depth-first search algo.
-func (tree *Tree[T]) RangeAll(fn func(*Tree[T]) bool) {
+func (tree *Tree[Key, Value]) RangeAll(fn func(*Tree[Key, Value]) bool) {
 	for _, child := range tree.nodes {
 		child.travel(-1, fn)
 	}
 }
 
-func (tree *Tree[T]) rangeOver(fn func(*Tree[T]) bool, maxDepth int, path ...string) {
+func (tree *Tree[Key, Value]) rangeOver(fn func(*Tree[Key, Value]) bool, maxDepth int, path ...Key) {
 	nn := tree.getLastTree(path...)
 	if nn == nil {
 		return
@@ -104,18 +104,18 @@ func (tree *Tree[T]) rangeOver(fn func(*Tree[T]) bool, maxDepth int, path ...str
 // RangeLimit limits the range to a maximum depth.
 //
 // The order in which RangeLimit travels the paths is the same as Range does.
-func (tree *Tree[T]) RangeLimit(fn func(*Tree[T]) bool, maxDepth int) {
+func (tree *Tree[Key, Value]) RangeLimit(fn func(*Tree[Key, Value]) bool, maxDepth int) {
 	tree.rangeOver(fn, maxDepth)
 }
 
 // RangeLevel will range over a specific level of the tree.
-func (tree *Tree[T]) RangeLevel(fn func(*Tree[T]) bool, level int) {
+func (tree *Tree[Key, Value]) RangeLevel(fn func(*Tree[Key, Value]) bool, level int) {
 	for _, child := range tree.nodes {
 		child.rangeLevel(fn, 0, level)
 	}
 }
 
-func (tree *Tree[T]) rangeLevel(fn func(*Tree[T]) bool, depth, level int) bool {
+func (tree *Tree[Key, Value]) rangeLevel(fn func(*Tree[Key, Value]) bool, depth, level int) bool {
 	if level-depth == 0 {
 		return fn(tree)
 	}
@@ -129,7 +129,7 @@ func (tree *Tree[T]) rangeLevel(fn func(*Tree[T]) bool, depth, level int) bool {
 	return true
 }
 
-func (tree *Tree[T]) travel(maxDepth int, fn func(*Tree[T]) bool) bool {
+func (tree *Tree[Key, Value]) travel(maxDepth int, fn func(*Tree[Key, Value]) bool) bool {
 	if maxDepth > -1 && tree.depth >= maxDepth {
 		return true
 	}
@@ -143,7 +143,7 @@ func (tree *Tree[T]) travel(maxDepth int, fn func(*Tree[T]) bool) bool {
 	return fn(tree)
 }
 
-func (tree *Tree[T]) getLastTree(path ...string) *Tree[T] {
+func (tree *Tree[Key, Value]) getLastTree(path ...Key) *Tree[Key, Value] {
 	if len(path) == 0 {
 		return tree
 	}
@@ -161,11 +161,11 @@ func (tree *Tree[T]) getLastTree(path ...string) *Tree[T] {
 	return tree
 }
 
-func (tree *Tree[T]) Set(data T, path ...string) {
-	tree.set(data, 0, []string{}, path...)
+func (tree *Tree[Key, Value]) Set(data Value, path ...Key) {
+	tree.set(data, 0, []Key{}, path...)
 }
 
-func (tree *Tree[T]) set(data T, depth int, cumPath []string, path ...string) {
+func (tree *Tree[Key, Value]) set(data Value, depth int, cumPath []Key, path ...Key) {
 	if len(path) == 0 {
 		tree.data = data
 		return
@@ -183,7 +183,7 @@ func (tree *Tree[T]) set(data T, depth int, cumPath []string, path ...string) {
 	}
 
 	// if not found, create the node
-	newTree := &Tree[T]{
+	newTree := &Tree[Key, Value]{
 		name:  path[0],
 		depth: depth,
 		path:  cumPath,
@@ -194,11 +194,11 @@ func (tree *Tree[T]) set(data T, depth int, cumPath []string, path ...string) {
 	newTree.set(data, depth+1, cumPath, path[1:]...)
 }
 
-func (tree *Tree[T]) Del(path ...string) {
+func (tree *Tree[Key, Value]) Del(path ...Key) {
 	tree.del(path...)
 }
 
-func (tree *Tree[T]) del(path ...string) bool {
+func (tree *Tree[Key, Value]) del(path ...Key) bool {
 	for i, newTree := range tree.nodes {
 		if newTree.name == path[0] {
 			if len(path) == 1 {

@@ -5,8 +5,26 @@ import (
 	"testing"
 )
 
+func TestTreeKeyInt(t *testing.T) {
+	var tree Tree[int, string]
+
+	tree.Set("hello", 1, 2, 3)
+	tree.Set("world", 1, 2)
+	tree.Set("idk", 1)
+
+	data := tree.Fetch(1, 2, 3)
+	if data.Get() != "hello" {
+		t.Fatalf("expected hello, got %s", data.Get())
+	}
+
+	data = tree.Fetch(1, 2)
+	if data.Get() != "world" {
+		t.Fatalf("expected world, got %s", data.Get())
+	}
+}
+
 func TestTree(t *testing.T) {
-	var tree Tree[int]
+	var tree Tree[string, int]
 
 	tree.Set(1, strings.Split("d/c/b/a", "/")...)
 	tree.Set(2, strings.Split("d/c/b/a", "/")...)
@@ -81,7 +99,7 @@ func TestTree(t *testing.T) {
 }
 
 func TestTreeTravel(t *testing.T) {
-	var tree Tree[int]
+	var tree Tree[string, int]
 
 	tree.Set(1, strings.Split("d/c/b/a", "/")...)
 	tree.Set(2, strings.Split("d/c/b", "/")...)
@@ -90,7 +108,7 @@ func TestTreeTravel(t *testing.T) {
 	tree.Set(80, "d", "c", "x")
 
 	rangeCount := 0
-	tree.RangeAll(func(node *Tree[int]) bool {
+	tree.RangeAll(func(node *Tree[string, int]) bool {
 		rangeCount++
 
 		return true
@@ -100,7 +118,7 @@ func TestTreeTravel(t *testing.T) {
 		t.Fatalf("Unexpected range: %d<>5", rangeCount)
 	}
 
-	tree.RangeLimit(func(node *Tree[int]) bool {
+	tree.RangeLimit(func(node *Tree[string, int]) bool {
 		if node.Name() != "d" {
 			t.Fatal("expected d only")
 		}
@@ -109,7 +127,7 @@ func TestTreeTravel(t *testing.T) {
 	}, 1)
 
 	iter := 0
-	tree.RangeLevel(func(node *Tree[int]) bool {
+	tree.RangeLevel(func(node *Tree[string, int]) bool {
 		iter++
 		if node.Name() != "d" {
 			t.Fatalf("Expected d, got %s", node.Name())
@@ -121,7 +139,7 @@ func TestTreeTravel(t *testing.T) {
 	}
 
 	countLevel := 0
-	tree.RangeLevel(func(node *Tree[int]) bool {
+	tree.RangeLevel(func(node *Tree[string, int]) bool {
 		countLevel++
 		if node.Name() != "c" {
 			t.Fatalf("Expected b, got %s", node.Name())
@@ -133,7 +151,7 @@ func TestTreeTravel(t *testing.T) {
 	}
 
 	countLevel = 0
-	tree.RangeLevel(func(node *Tree[int]) bool {
+	tree.RangeLevel(func(node *Tree[string, int]) bool {
 		countLevel++
 		if countLevel == 1 && node.Name() != "b" {
 			t.Fatalf("Expected b, got %s", node.Name())
@@ -152,7 +170,7 @@ func TestTreeTravel(t *testing.T) {
 	tree.Del("d", "c", "x")
 
 	count := 0
-	tree.RangeLimit(func(node *Tree[int]) bool {
+	tree.RangeLimit(func(node *Tree[string, int]) bool {
 		switch count {
 		case 0:
 			if node.Name() != "c" {
@@ -173,7 +191,7 @@ func TestTreeTravel(t *testing.T) {
 	datas := []int{1, 2, 3, 4}
 
 	idx := 0
-	tree.Range(func(n *Tree[int]) bool {
+	tree.Range(func(n *Tree[string, int]) bool {
 		if n.Name() != order[idx] {
 			t.Fatalf("unexpected element. Expected %s got %s", order[idx], n.Name())
 		}
@@ -200,7 +218,7 @@ func TestTreeTravel(t *testing.T) {
 	}
 
 	idx = 0
-	tree.Range(func(n *Tree[int]) bool {
+	tree.Range(func(n *Tree[string, int]) bool {
 		if n.Name() != order[idx] {
 			t.Fatalf("unexpected element. Expected %s got %s", order[idx], n.Name())
 		}
