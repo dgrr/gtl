@@ -1,9 +1,5 @@
 package gtl
 
-import (
-	"github.com/dgrr/gtl"
-)
-
 type Tree[T any] struct {
 	data T
 
@@ -47,7 +43,7 @@ func (tree *Tree[T]) Depth() int {
 // As `c` doesn't exist, Get will return depth = 1 and data = 2.
 //
 // To get the exact data from the path use Fetch.
-func (tree *Tree[T]) Get(path ...string) (depth int, opt gtl.Optional[T]) {
+func (tree *Tree[T]) Get(path ...string) (depth int, opt Optional[T]) {
 	depth = -1
 
 	lastTree := tree.getLastTree(path...)
@@ -60,7 +56,7 @@ func (tree *Tree[T]) Get(path ...string) (depth int, opt gtl.Optional[T]) {
 }
 
 // Fetch returns the data from the exact path. If the path doesn't exist nil will be returned.
-func (tree *Tree[T]) Fetch(path ...string) (opt gtl.Optional[T]) {
+func (tree *Tree[T]) Fetch(path ...string) (opt Optional[T]) {
 	lastTree := tree.getLastTree(path...)
 	if lastTree != nil {
 		// len - 1 because the depth starts on 0
