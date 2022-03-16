@@ -1,8 +1,9 @@
 package gtl
 
 import (
-	"golang.org/x/exp/constraints"
 	"time"
+
+	"golang.org/x/exp/constraints"
 )
 
 type orderedCriteria[K constraints.Ordered, T any] struct {

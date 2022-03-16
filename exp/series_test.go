@@ -18,12 +18,15 @@ type Trade struct {
 func TestSeries(t *testing.T) {
 	s := NewSeries(
 		NewSeriesOpts[Trade, Trade, float64]().
-			WindowTime(time.Second, TakeTime).
+			WindowTime(
+				time.Second, TakeTime,
+			).
 			Filter(func(trade Trade) bool {
 				return trade.Qty > 5
-			}).Aggregate(func(trade Trade) float64 {
-			return trade.Price
-		}),
+			}).
+			Aggregate(func(trade Trade) float64 {
+				return trade.Price
+			}),
 	)
 
 	trades := []Trade{
