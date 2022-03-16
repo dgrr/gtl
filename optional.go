@@ -18,26 +18,27 @@ func MakeOptional[T any](v *T) (opt Optional[T]) {
 }
 
 // OptionalFrom ...
-func OptionalFrom[T any](v T, err error) (opt Optional[T]) {
-	return opt.From(v, err)
+func OptionalFrom[T any](v T) (opt Optional[T]) {
+	return opt.From(v)
 }
 
 // OptionalWithCond creates an optional using the second argument as condition.
 // If the condition is true, the first argument is set as the underlying optional value.
 func OptionalWithCond[T any](v T, cond bool) (opt Optional[T]) {
+	return opt.WithCond(v, cond)
+}
+
+func (opt Optional[T]) WithCond(v T, cond bool) Optional[T] {
 	if cond {
 		opt.Set(v)
 	}
 
-	return
+	return opt
 }
 
 // From ...
-func (opt Optional[T]) From(v T, err error) Optional[T] {
-	if err == nil {
-		opt.Set(v)
-	}
-
+func (opt Optional[T]) From(v T) Optional[T] {
+	opt.Set(v)
 	return opt
 }
 
