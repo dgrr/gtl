@@ -23,7 +23,7 @@ var prices = map[string]float64{
 func getPrices() (vec gtl.Vec[gtl.Pair[string, gtl.Optional[float64]]]) {
 	for k, v := range prices {
 		vec.Append(
-			gtl.MakePair(k, gtl.OptionalFromBool(v, v != 0)))
+			gtl.MakePair(k, gtl.OptionalWithCond(v, v != 0)))
 	}
 
 	return

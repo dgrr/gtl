@@ -1,25 +1,25 @@
 package gtl
 
-type element[T any] struct {
+type listElement[T any] struct {
 	v    T
-	next *element[T]
+	next *listElement[T]
 }
 
 // List defines a linked-list.
 type List[T any] struct {
-	next *element[T]
+	next *listElement[T]
 }
 
 // Add adds v to the front of the linked list.
 func (lst *List[T]) Add(v T) {
-	e := element[T]{
+	e := listElement[T]{
 		v:    v,
 		next: lst.next,
 	}
 	lst.next = &e
 }
 
-// PopFront returns the first element removing it from the linked list.
+// PopFront returns the first listElement removing it from the linked list.
 func (lst *List[T]) PopFront() (v T) {
 	if lst.next != nil {
 		v = lst.next.v
@@ -31,9 +31,9 @@ func (lst *List[T]) PopFront() (v T) {
 
 // Iter returns an iterator for the linked list.
 func (lst *List[T]) Iter() Iterator[T] {
-	iter := &Iter[T, *element[T]]{
+	iter := &Iter[T, *listElement[T]]{
 		index: lst.next,
-		next: func(prev *element[T]) (*T, *element[T]) {
+		next: func(prev *listElement[T]) (*T, *listElement[T]) {
 			if prev == nil {
 				return nil, nil
 			}

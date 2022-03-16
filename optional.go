@@ -22,7 +22,9 @@ func OptionalFrom[T any](v T, err error) (opt Optional[T]) {
 	return opt.From(v, err)
 }
 
-func OptionalFromBool[T any](v T, cond bool) (opt Optional[T]) {
+// OptionalWithCond creates an optional using the second argument as condition.
+// If the condition is true, the first argument is set as the underlying optional value.
+func OptionalWithCond[T any](v T, cond bool) (opt Optional[T]) {
 	if cond {
 		opt.Set(v)
 	}
@@ -39,13 +41,27 @@ func (opt Optional[T]) From(v T, err error) Optional[T] {
 	return opt
 }
 
+// Ptr returns a pointer to the value. If there's no value set, nil is returned.
+func (opt Optional[T]) Ptr() *T {
+	if opt.hasValue {
+		return &opt.value
+	}
+
+	return nil
+}
+
 // Unwrap unwraps the value held.
 func (opt Optional[T]) Unwrap() T {
 	return opt.Get()
 }
 
-// V returns the held value if it has been defined previously.
+// Get returns the value held by the Optional.
 func (opt Optional[T]) Get() T {
+	return opt.Value()
+}
+
+// Value returns the value held by the Optional.
+func (opt Optional[T]) Value() T {
 	return opt.value
 }
 
@@ -62,6 +78,11 @@ func (opt Optional[T]) Or(v T) Optional[T] {
 // IsOk returns true if Optional is holding a value.
 func (opt Optional[T]) IsOk() bool {
 	return opt.hasValue
+}
+
+// HasValue returns true if the Optional is holding a valid value.
+func (opt Optional[T]) HasValue() bool {
+	return opt.IsOk()
 }
 
 // Set sets the value to the optional struct.
