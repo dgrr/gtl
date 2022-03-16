@@ -69,8 +69,21 @@ func (opt Optional[T]) Value() T {
 // Or assigns `v` to `opt` only if the Optional value is not defined.
 func (opt Optional[T]) Or(v T) Optional[T] {
 	if !opt.hasValue {
-		opt.value = v
-		opt.hasValue = true
+		opt.Set(v)
+	}
+
+	return opt
+}
+
+// OrFn operates like Or but with the difference that OrFn will assign the object
+// returned from a function.
+//
+// This function is useful if the alternative object is expensive to make. Instead of
+// creating the object regardless the previous result, OrFn will only build the object
+// if there's no previous value available.
+func (opt Optional[T]) OrFn(fn func() T) Optional[T] {
+	if !opt.hasValue {
+		opt.Set(fn())
 	}
 
 	return opt
