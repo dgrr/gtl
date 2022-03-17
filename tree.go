@@ -55,13 +55,15 @@ func (tree *Tree[Key, Value]) Get(path ...Key) (depth int, opt Optional[Value]) 
 	return
 }
 
-// Fetch returns the data from the exact path. If the path doesn't exist nil will be returned.
+// Fetch returns the data from the specific path.
 func (tree *Tree[Key, Value]) Fetch(path ...Key) (opt Optional[Value]) {
-	lastTree := tree.getLastTree(path...)
-	if lastTree != nil {
-		// len - 1 because the depth starts on 0
-		if lastTree.depth == len(path)-1 {
-			opt = lastTree.data
+	if len(path) == 0 {
+		return tree.data
+	}
+
+	for _, node := range tree.nodes {
+		if node.Name() == path[0] {
+			return node.Fetch(path[1:]...)
 		}
 	}
 

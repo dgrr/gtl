@@ -14,7 +14,7 @@ func TestTreeKeyInt(t *testing.T) {
 
 	data := tree.Fetch(1, 2, 3)
 	if data.Get() != "hello" {
-		t.Fatalf("expected hello, got %s", data.Get())
+		t.Fatalf("expected hello, got `%s`", data.Get())
 	}
 
 	data = tree.Fetch(1, 2)
