@@ -27,6 +27,10 @@ func (s Sender[T]) Send(data T) bool {
 	}
 }
 
+func (s Sender[T]) Len() int {
+	return len(s.ch)
+}
+
 func (s Sender[T]) Close() error {
 	close(s.ch)
 	return nil
@@ -57,6 +61,10 @@ func (r Receiver[T]) Range(fn func(T)) {
 	}
 }
 
+func (r Receiver[T]) Len() int {
+	return len(r.ch)
+}
+
 func (r Receiver[T]) RangeBool(fn func(T) bool) {
 	for v := range r.ch {
 		if !fn(v) {
@@ -74,6 +82,10 @@ func MakeChan[T any](size int) Channel[T] {
 	return Channel[T]{
 		ch: make(chan T, size),
 	}
+}
+
+func (ch Channel[T]) Len() int {
+	return len(ch.ch)
 }
 
 func (ch Channel[T]) Split() (Sender[T], Receiver[T]) {
