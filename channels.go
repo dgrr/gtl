@@ -1,22 +1,20 @@
 package gtl
 
+import (
+	"sync/atomic"
+)
+
 type Sender[T any] struct {
-	ch   chan T
-	done chan struct{}
+	ch chan<- T
 }
 
-func MakeSender[T any](size int) Sender[T] {
-	return MakeSenderChan(make(chan T, size))
-}
-
-func MakeSenderChan[T any](ch chan T) Sender[T] {
+func MakeSender[T any](ch chan<- T) Sender[T] {
 	return Sender[T]{
-		ch:   ch,
-		done: make(chan struct{}, 1),
+		ch: ch,
 	}
 }
 
-func (s Sender[T]) Get() chan T {
+func (s Sender[T]) Get() chan<- T {
 	return s.ch
 }
 
@@ -24,7 +22,7 @@ func (s Sender[T]) Send(data T) bool {
 	select {
 	case s.ch <- data:
 		return true
-	case <-s.done:
+	default:
 		return false
 	}
 }
@@ -35,14 +33,10 @@ func (s Sender[T]) Close() error {
 }
 
 type Receiver[T any] struct {
-	ch chan T
+	ch <-chan T
 }
 
-func MakeReceiver[T any](size int) Receiver[T] {
-	return MakeReceiverChan(make(chan T, size))
-}
-
-func MakeReceiverChan[T any](ch chan T) Receiver[T] {
+func MakeReceiver[T any](ch <-chan T) Receiver[T] {
 	return Receiver[T]{
 		ch: ch,
 	}
@@ -51,6 +45,10 @@ func MakeReceiverChan[T any](ch chan T) Receiver[T] {
 func (r Receiver[T]) Next() Optional[T] {
 	v, ok := <-r.ch
 	return OptionalWithCond[T](v, ok)
+}
+
+func (r Receiver[T]) Get() <-chan T {
+	return r.ch
 }
 
 func (r Receiver[T]) Range(fn func(T)) {
@@ -67,7 +65,25 @@ func (r Receiver[T]) RangeBool(fn func(T) bool) {
 	}
 }
 
-func (r Receiver[T]) Close() error {
-	close(r.ch)
+type Channel[T any] struct {
+	ch     chan T
+	closed int32
+}
+
+func MakeChan[T any](size int) Channel[T] {
+	return Channel[T]{
+		ch: make(chan T, size),
+	}
+}
+
+func (ch Channel[T]) Split() (Sender[T], Receiver[T]) {
+	return MakeSender(ch.ch), MakeReceiver(ch.ch)
+}
+
+func (ch *Channel[T]) Close() error {
+	if atomic.CompareAndSwapInt32(&ch.closed, 0, 1) {
+		close(ch.ch)
+	}
+
 	return nil
 }
