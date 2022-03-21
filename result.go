@@ -44,12 +44,10 @@ func (r Result[T]) Err(e error) Result[T] {
 // Any takes from input either T or E. If E is defined, V is not used.
 func (r Result[T]) Any(value T, err error) Result[T] {
 	if err == nil {
-		r.value = value
-	} else {
-		r.err = err
+		return r.Ok(value)
 	}
 
-	return r
+	return r.Err(err)
 }
 
 // Or sets the value `value` only if the error was previously set.
@@ -75,7 +73,7 @@ func (r Result[T]) Map(fn func(T) T) Result[T] {
 
 // Unwrap unwraps the Result returning the value, if any.
 func (r Result[T]) Unwrap() T {
-	return r.value
+	return r.Get()
 }
 
 // Expect returns the holding value. If `r` is holding an error, the function panics
@@ -118,7 +116,7 @@ func (r Result[T]) Then(fn func(T)) Result[T] {
 // The returned error will be set to the Result's error.
 func (r Result[T]) ThenE(fn func(T) error) Result[T] {
 	if r.err == nil {
-		r.err = fn(r.value)
+		return r.Err(fn(r.value))
 	}
 
 	return r
@@ -139,7 +137,7 @@ func (r Result[T]) Else(fn func(error)) Result[T] {
 // The returned error will be set to the Result's error.
 func (r Result[T]) ElseE(fn func(error) error) Result[T] {
 	if r.err != nil {
-		r.err = fn(r.err)
+		return r.Err(fn(r.err))
 	}
 
 	return r
