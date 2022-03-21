@@ -20,14 +20,14 @@ func AddIfEven(a, b int) (r Result[int]) {
 func main() {
 	s := "19oo"
 
-	r := NewResult(
+	r := MakeResult(
 		strconv.Atoi(s)).Or(-1)
-	if r.V() == -1 {
+	if r.Get() == -1 {
 		fmt.Printf("%s conversion failed\n", s)
 	}
 
-	if r := AddIfEven(2, 1); r.E() != nil {
-		fmt.Printf("error: %s\n", r.E())
+	if r := AddIfEven(2, 1); r.Error() != nil {
+		fmt.Printf("error: %s\n", r.Error())
 	}
 
 	AddIfEven(4, 2).Then(func(res int) {
@@ -35,5 +35,5 @@ func main() {
 	})
 
 	fmt.Println(
-		"adding odd numbers", AddIfEven(1, 2).Or(-1).V())
+		"adding odd numbers", AddIfEven(1, 2).Or(-1).Get())
 }

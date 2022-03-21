@@ -9,59 +9,56 @@ import (
 // A result has an expected value, which is T
 // and an unexpected value, which is E. E is often used as error.
 type Result[T any] struct {
-	v T
-	e error
+	value T
+	err   error
 }
 
-// NewResult returns a Result from 2 values. It is useful when we want
+// MakeResult returns a Result from 2 values. It is useful when we want
 // to capture old-style function returning.
-func NewResult[T any](v T, err error) (r Result[T]) {
-	r.v = v
-	if err != nil {
-		r.e = err
-	}
-
-	return r
+func MakeResult[T any](v T, err error) (r Result[T]) {
+	return r.Any(v, err)
 }
 
 // Ok returns a Result holding an expected value.
 //
 // If `r` was previously holding an unexpected value that is discarded.
 func (r Result[T]) Ok(v T) Result[T] {
-	r.v = v
+	r.value = v
+	r.err = nil
 
 	return r
 }
 
 // IsOk returns whether the Result has the unexpected value set or not.
 func (r Result[T]) IsOk() bool {
-	return r.e == nil
+	return r.err == nil
 }
 
 // Err returns a Result holding an unexpected value (an error).
 func (r Result[T]) Err(e error) Result[T] {
-	r.e = e
+	r.err = e
 
 	return r
 }
 
 // Any takes from input either T or E. If E is defined, V is not used.
-func (r Result[T]) Any(v T, e error) Result[T] {
-	r.e = e
-	if e == nil {
-		r.v = v
+func (r Result[T]) Any(value T, err error) Result[T] {
+	if err == nil {
+		r.value = value
+	} else {
+		r.err = err
 	}
 
 	return r
 }
 
-// Or sets the value `v` only if the error was previously set.
+// Or sets the value `value` only if the error was previously set.
 // That means: In case the Result has failed, set this alternative value.
 //
-// If the Result is holding an error, the error is cleared out and `v` is set.
+// If the Result is holding an error, the error is cleared out and `value` is set.
 func (r Result[T]) Or(v T) Result[T] {
-	if r.e == nil {
-		r = r.Ok(v)
+	if r.err != nil {
+		return r.Ok(v)
 	}
 
 	return r
@@ -69,8 +66,8 @@ func (r Result[T]) Or(v T) Result[T] {
 
 // Map passes the holding value to `fn` if no error is being held.
 func (r Result[T]) Map(fn func(T) T) Result[T] {
-	if r.e == nil {
-		r.v = fn(r.v)
+	if r.err == nil {
+		r.value = fn(r.value)
 	}
 
 	return r
@@ -78,38 +75,38 @@ func (r Result[T]) Map(fn func(T) T) Result[T] {
 
 // Unwrap unwraps the Result returning the value, if any.
 func (r Result[T]) Unwrap() T {
-	return r.v
+	return r.value
 }
 
 // Expect returns the holding value. If `r` is holding an error, the function panics
 // with a message of the format: `str: error`.
 func (r Result[T]) Expect(str string) T {
-	if r.e != nil {
-		panic(fmt.Sprintf("%s: %s", str, r.e))
+	if r.err != nil {
+		panic(fmt.Sprintf("%s: %s", str, r.err))
 	}
 
-	return r.v
+	return r.value
 }
 
-// V returns the expected value.
-func (r Result[T]) V() T {
-	return r.v
+// Get returns the expected value.
+func (r Result[T]) Get() T {
+	return r.value
 }
 
-// E returns the unexpected value.
-func (r Result[T]) E() error {
-	return r.e
+// Err returns the unexpected value.
+func (r Result[T]) Error() error {
+	return r.err
 }
 
-// VE returns the value and the error.
-func (r Result[T]) VE() (T, error) {
-	return r.V(), r.E()
+// Both returns the value and the error.
+func (r Result[T]) Both() (T, error) {
+	return r.Get(), r.Error()
 }
 
 // Then is executed if Result is not holding an unexpected error.
 func (r Result[T]) Then(fn func(T)) Result[T] {
-	if r.e == nil {
-		fn(r.v)
+	if r.err == nil {
+		fn(r.value)
 	}
 
 	return r
@@ -120,8 +117,8 @@ func (r Result[T]) Then(fn func(T)) Result[T] {
 // The function must return en error. The error can be nil.
 // The returned error will be set to the Result's error.
 func (r Result[T]) ThenE(fn func(T) error) Result[T] {
-	if r.e == nil {
-		r.e = fn(r.v)
+	if r.err == nil {
+		r.err = fn(r.value)
 	}
 
 	return r
@@ -129,8 +126,8 @@ func (r Result[T]) ThenE(fn func(T) error) Result[T] {
 
 // Else is executed if Result is holding an error.
 func (r Result[T]) Else(fn func(error)) Result[T] {
-	if r.e != nil {
-		fn(r.e)
+	if r.err != nil {
+		fn(r.err)
 	}
 
 	return r
@@ -141,8 +138,8 @@ func (r Result[T]) Else(fn func(error)) Result[T] {
 // The function must return an error. The error can be nil.
 // The returned error will be set to the Result's error.
 func (r Result[T]) ElseE(fn func(error) error) Result[T] {
-	if r.e != nil {
-		r.e = fn(r.e)
+	if r.err != nil {
+		r.err = fn(r.err)
 	}
 
 	return r
