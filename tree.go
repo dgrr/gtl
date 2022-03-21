@@ -167,6 +167,13 @@ func (tree *Tree[Key, Value]) Set(data Value, path ...Key) {
 	tree.set(data, 0, []Key{}, path...)
 }
 
+func (tree *Tree[Key, Value]) SetRange(data Value, lvl int) {
+	tree.RangeLevel(func(subNode *Tree[Key, Value]) bool {
+		subNode.Set(data)
+		return true
+	}, lvl)
+}
+
 func (tree *Tree[Key, Value]) set(data Value, depth int, cumPath []Key, path ...Key) {
 	if len(path) == 0 {
 		tree.data.Set(data)

@@ -167,7 +167,7 @@ func (vc *Vec[T]) iter() *Iter[T, int] {
 // Index returns the index of an element inside the vector.
 // The `cmpFn` lambda is used to perform the comparison. The lambda
 // gets as input an Iterator[T] and should return true if the value matches the expected.
-func (vc *Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
+func (vc Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
 	i := -1
 	for it := vc.iter(); it.Next(); {
 		if cmpFn(it) {
@@ -177,6 +177,10 @@ func (vc *Vec[T]) Index(cmpFn func(it Iterator[T]) bool) int {
 	}
 
 	return i
+}
+
+func (vc Vec[T]) Contains(cmpFn func(it Iterator[T]) bool) bool {
+	return vc.Index(cmpFn) >= 0
 }
 
 // Search iterates over the vector calling `cmpFn`.
