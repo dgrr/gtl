@@ -75,6 +75,22 @@ func (opt Optional[T]) Or(v T) Optional[T] {
 	return opt
 }
 
+// Then will be called if Optional is holding a value.
+func (opt Optional[T]) Then(fn func(T)) Optional[T] {
+	if opt.hasValue {
+		fn(opt.value)
+	}
+	return opt
+}
+
+// Else will be called if Optional is not holding any value.
+func (opt Optional[T]) Else(fn func()) Optional[T] {
+	if !opt.hasValue {
+		fn()
+	}
+	return opt
+}
+
 // OrFn operates like Or but with the difference that OrFn will assign the object
 // returned from a function.
 //
