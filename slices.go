@@ -51,3 +51,27 @@ func FilterInPlace[T any](set []T, criteria func(T) bool) []T {
 
 	return set
 }
+
+// Delete the first occurrence of a type from a set.
+func Delete[T comparable](set []T, value T) []T {
+	for i := 0; i < len(set); i++ {
+		if set[i] == value {
+			set = append(set[:i], set[i:]...)
+			break
+		}
+	}
+
+	return set
+}
+
+// DeleteAll occurrences from a set.
+func DeleteAll[T comparable](set []T, value T) []T {
+	for i := 0; i < len(set); i++ {
+		if set[i] == value {
+			set = append(set[:i], set[i:]...)
+			i--
+		}
+	}
+
+	return set
+}
