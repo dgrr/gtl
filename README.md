@@ -1,4 +1,6 @@
-Use TL (https://github.com/dgrr/tl)
+# DEPRECATION!
+
+## Use TL (https://github.com/dgrr/tl)
 
 # GTL: Golang Template Library (WIP)
 
