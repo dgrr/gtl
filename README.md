@@ -1,3 +1,5 @@
+Use TL (https://github.com/dgrr/tl)
+
 # GTL: Golang Template Library (WIP)
 
 GTL is a template library written in pure Go(2).
